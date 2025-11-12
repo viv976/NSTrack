@@ -125,18 +125,49 @@ const ProblemsPage = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, rgb(3,7,18) 0%, rgb(6,15,35) 100%)' }}>
+    <div className="min-h-screen transition-colors duration-300" style={{ 
+      background: theme === 'dark' 
+        ? 'linear-gradient(135deg, rgb(3,7,18) 0%, rgb(6,15,35) 100%)' 
+        : 'linear-gradient(135deg, rgb(243,244,246) 0%, rgb(229,231,235) 100%)'
+    }}>
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Header */}
-        <div className="mb-12 text-center animate-fade-in">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <Trophy className="w-12 h-12 text-cyan-400" />
-            <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" data-testid="problems-title">
-              Practice Problems
-            </h1>
+        {/* Header with Theme Toggle */}
+        <div className="mb-12 animate-fade-in">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Trophy className={`w-12 h-12 ${theme === 'dark' ? 'text-cyan-400' : 'text-blue-600'}`} />
+              <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" data-testid="problems-title">
+                Practice Problems
+              </h1>
+            </div>
+            
+            {/* Theme Toggle Button */}
+            <Button
+              onClick={toggleTheme}
+              data-testid="theme-toggle-btn"
+              className={`rounded-full w-12 h-12 p-0 shadow-lg transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-slate-700 hover:bg-slate-600 text-yellow-400'
+                  : 'bg-white hover:bg-gray-100 text-slate-800 border-2 border-gray-300'
+              }`}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </Button>
           </div>
-          <p className="text-lg text-slate-300">Challenge yourself and earn points</p>
-          <p className="text-cyan-400 font-semibold mt-2" data-testid="problems-points">Your Points: {user?.points || 0}</p>
+          
+          <div className="text-center">
+            <p className={`text-lg ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}>
+              Challenge yourself and earn points
+            </p>
+            <p className={`font-semibold mt-2 ${theme === 'dark' ? 'text-cyan-400' : 'text-blue-600'}`} data-testid="problems-points">
+              Your Points: {user?.points || 0}
+            </p>
+          </div>
         </div>
 
         {/* Filters */}
