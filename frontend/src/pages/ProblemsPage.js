@@ -21,6 +21,7 @@ const ProblemsPage = () => {
   const [selectedProblem, setSelectedProblem] = useState(null);
   const [showEditor, setShowEditor] = useState({});
   const { markProblemComplete: markProblemInProgress } = useProgress();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
