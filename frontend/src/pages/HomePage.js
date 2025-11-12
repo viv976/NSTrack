@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Code, Smartphone, Brain, Trophy, Sparkles, BookOpen, Target, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Code, Smartphone, Brain, Trophy, Sparkles, BookOpen, Target, Users, ArrowRight, CheckCircle2, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
