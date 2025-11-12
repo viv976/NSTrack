@@ -363,8 +363,11 @@ const ProblemsPage = () => {
         )}
 
         {!loading && problems.length === 0 && (
-          <div className="text-center text-slate-400 py-12" data-testid="no-problems">
-            <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
+          <div 
+            className={`text-center py-12 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`} 
+            data-testid="no-problems"
+          >
+            <Trophy className={`w-16 h-16 mx-auto mb-4 opacity-50 ${theme === 'dark' ? '' : 'text-slate-400'}`} />
             <p className="text-lg">Select track and difficulty to generate problems</p>
           </div>
         )}
