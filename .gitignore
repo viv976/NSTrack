@@ -1,3 +1,4 @@
+.env
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # IDE and editors
@@ -81,3 +82,4 @@ android-sdk/ -e
 # Environment files
 *.env
 *.env.*
+frontend/project_backup.zip

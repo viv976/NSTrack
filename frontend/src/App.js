@@ -14,7 +14,7 @@ import { Toaster } from 'sonner';
 import { ThemeProvider } from './context/ThemeContext';
 import { ProgressProvider } from './context/ProgressContext';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = 'http://localhost:8000';
 export const API = `${BACKEND_URL}/api`;
 
 export const getAuthHeaders = () => {
@@ -32,6 +32,9 @@ function App() {
       setIsAuthenticated(true);
     }
     setLoading(false);
+    // Force dark theme
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('bg-black', 'text-white');
   }, []);
 
   if (loading) {
@@ -45,7 +48,7 @@ function App() {
   return (
     <ThemeProvider>
       <ProgressProvider>
-        <div className="App min-h-screen bg-[rgb(3,7,18)] dark:bg-[rgb(3,7,18)]">
+        <div className="App min-h-screen bg-black text-white">
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<HomePage />} />

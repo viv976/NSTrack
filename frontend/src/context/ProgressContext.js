@@ -77,16 +77,40 @@ export const ProgressProvider = ({ children }) => {
     return Object.keys(progress.completedProblems).length;
   };
 
+  const resetLanguageProgress = (language) => {
+    const newProgress = {
+      ...progress,
+      completedTopics: {
+        ...progress.completedTopics,
+        [language]: {}
+      },
+      completedProblems: Object.fromEntries(
+        Object.entries(progress.completedProblems).filter(
+          ([key]) => !key.startsWith(`${language}-`)
+        )
+      )
+    };
+    
+    // Update localStorage directly first
+    localStorage.setItem('learningProgress', JSON.stringify(newProgress));
+    
+    // Then update the state
+    setProgress(newProgress);
+  };
+
   return (
-    <ProgressContext.Provider value={{
-      progress,
-      markTopicComplete,
-      markProblemComplete,
-      setSelectedLanguage,
-      updateStreak,
-      getTopicProgress,
-      getProblemsSolved
-    }}>
+    <ProgressContext.Provider
+      value={{
+        progress,
+        markTopicComplete,
+        markProblemComplete,
+        setSelectedLanguage,
+        updateStreak,
+        getTopicProgress,
+        getProblemsSolved,
+        resetLanguageProgress
+      }}
+    >
       {children}
     </ProgressContext.Provider>
   );

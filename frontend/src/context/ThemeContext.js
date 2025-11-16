@@ -1,28 +1,28 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'dark';
-  });
+  // Always use dark theme
+  const theme = 'dark';
 
   useEffect(() => {
-    localStorage.setItem('theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
+    // Force dark theme on the root element
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('bg-black', 'text-white');
+    
+    // Set theme in localStorage for consistency
+    localStorage.setItem('theme', 'dark');
+  }, []);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-  };
+  // No-op since we're forcing dark theme
+  const toggleTheme = () => {};
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
+      <div className="min-h-screen bg-black text-white">
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 };
@@ -34,3 +34,5 @@ export const useTheme = () => {
   }
   return context;
 };
+
+export default ThemeContext;

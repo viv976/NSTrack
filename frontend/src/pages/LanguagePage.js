@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { Progress } from '../components/ui/progress';
 import { Badge } from '../components/ui/badge';
-import { BookOpen, Code2, CheckCircle2, Circle, Lock, Trophy, Play, Award } from 'lucide-react';
+import { BookOpen, Code2, CheckCircle2, Circle, Lock, Trophy, Play, Award, X, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProgress } from '../context/ProgressContext';
 import { languageRoadmaps } from '../data/languageContent';
@@ -15,10 +15,11 @@ import MiniCodingQuestion from '../components/MiniCodingQuestion';
 
 const LanguagePage = () => {
   const { lang } = useParams();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState(null);
   const [showPractice, setShowPractice] = useState({});
   const [completedPractice, setCompletedPractice] = useState({});
-  const { progress, markTopicComplete, getTopicProgress } = useProgress();
+  const { progress, markTopicComplete, getTopicProgress, resetLanguageProgress } = useProgress();
   
   const roadmap = languageRoadmaps[lang];
   const questions = practiceQuestions[lang] || {};
@@ -92,8 +93,8 @@ const LanguagePage = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, rgb(3,7,18) 0%, rgb(6,15,35) 100%)' }}>
-      <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="flex flex-col min-h-screen">
+      <div className="container mx-auto px-4 py-8 pb-32 flex-1">
         {/* Header */}
         <div className="mb-12 animate-fade-in">
           <div className="flex items-center justify-between mb-6">
@@ -302,18 +303,45 @@ const LanguagePage = () => {
           </div>
         )}
 
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <Button
-            onClick={() => window.close()}
-            data-testid="close-language-btn"
-            variant="outline"
-            className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
-          >
-            Close
-          </Button>
-        </div>
       </div>
+      
+      {/* Footer Buttons - At the end of content */}
+      <div className="w-full bg-gray-800 border-t border-gray-700 p-4 flex justify-center gap-4 mt-8">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2"
+        >
+          <X className="h-4 w-4" />
+          Close
+        </Button>
+        <Button 
+          variant="default" 
+          onClick={() => {
+            // Reset progress for the current language
+            resetLanguageProgress(lang);
+            
+            // Force a re-render by updating state
+            setActiveSection(null);
+            setShowPractice({});
+            
+            // Show a success message
+            toast.success('Progress has been reset. Starting fresh!');
+            
+            // Scroll to top after a small delay to ensure state updates are processed
+            setTimeout(() => {
+              window.scrollTo(0, 0);
+              // Force a re-render of the component to reflect the reset progress
+              setActiveSection(prev => null);
+            }, 100);
+          }}
+          className="bg-cyan-600 hover:bg-cyan-700 flex items-center gap-2"
+        >
+          <RotateCcw className="h-4 w-4" />
+          Restart Learning
+        </Button>
+      </div>
+      
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { API } from '../App';
@@ -50,8 +50,16 @@ const SignupPage = ({ setAuth }) => {
     }
   };
 
+  // Force dark theme for signup page
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    return () => {
+      // Cleanup if needed when component unmounts
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(135deg, rgb(3,7,18) 0%, rgb(6,15,35) 100%)' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-black">
       <ConfettiCelebration show={showConfetti} onComplete={() => setShowConfetti(false)} />
       
       <Link to="/" className="absolute top-6 left-6">
@@ -62,20 +70,20 @@ const SignupPage = ({ setAuth }) => {
       
       <div className="w-full max-w-md animate-fade-in">
         {showWelcome && (
-          <div className="glass-effect rounded-2xl p-6 mb-6 text-center animate-fade-in" data-testid="welcome-message">
+          <div className="bg-gray-900/90 rounded-2xl p-6 mb-6 text-center border border-gray-800">
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
               Welcome to NSTrack! 🎉
             </h2>
-            <p className="text-slate-300">Your learning journey begins now...</p>
+            <p className="text-gray-400">Your learning journey begins now...</p>
           </div>
         )}
         
-        <div className="glass-effect rounded-2xl p-8 hover-glow">
+        <div className="bg-gray-900/90 rounded-2xl p-8 border border-gray-800 hover:border-cyan-500/30 transition-colors">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2" data-testid="signup-title">
-              Join NSTrack
+            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+              NSTrack
             </h1>
-            <p className="text-slate-300 text-lg">Start your learning journey</p>
+            <p className="text-gray-400 text-lg font-medium">Create your account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5" data-testid="signup-form">
@@ -87,7 +95,7 @@ const SignupPage = ({ setAuth }) => {
                 data-testid="name-input"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="mt-2 bg-slate-800/50 border-slate-700 text-white focus:border-cyan-500 focus:ring-cyan-500"
+                className="mt-2 bg-gray-800 border-gray-700 text-white focus:border-cyan-500 focus:ring-cyan-500"
                 placeholder="John Doe"
                 required
                 disabled={loading}
@@ -102,7 +110,7 @@ const SignupPage = ({ setAuth }) => {
                 data-testid="email-input"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="mt-2 bg-slate-800/50 border-slate-700 text-white focus:border-cyan-500 focus:ring-cyan-500"
+                className="mt-2 bg-gray-800 border-gray-700 text-white focus:border-cyan-500 focus:ring-cyan-500"
                 placeholder="your.email@nst.edu"
                 required
                 disabled={loading}
@@ -117,7 +125,7 @@ const SignupPage = ({ setAuth }) => {
                 data-testid="password-input"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="mt-2 bg-slate-800/50 border-slate-700 text-white focus:border-cyan-500 focus:ring-cyan-500"
+                className="mt-2 bg-gray-800 border-gray-700 text-white focus:border-cyan-500 focus:ring-cyan-500"
                 placeholder="••••••••"
                 required
                 disabled={loading}

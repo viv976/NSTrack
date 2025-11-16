@@ -20,6 +20,14 @@ const Dashboard = () => {
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
+      
+      // Check if this is the first time the user is logging in
+      const firstLogin = localStorage.getItem('firstLogin');
+      if (firstLogin === null) {
+        // This is the first login
+        localStorage.setItem('firstLogin', 'false');
+        // You could also set a state to show a special welcome message
+      }
     }
   }, []);
 
@@ -31,7 +39,7 @@ const Dashboard = () => {
 
   const handleLanguageSelect = (lang) => {
     setSelectedLanguage(lang);
-    window.open(`/language/${lang}`, '_blank');
+    navigate(`/language/${lang}`);
   };
 
   const handleTrackSelect = (track) => {
@@ -45,7 +53,7 @@ const Dashboard = () => {
       toast.error('Please select a learning track first');
       return;
     }
-    window.open('/roadmap', '_blank');
+    navigate('/roadmap');
   };
 
   const tracks = [
@@ -84,95 +92,88 @@ const Dashboard = () => {
   const totalProgress = Math.min(((problemsSolved * 10 + topicsCompleted * 15) / 100) * 100, 100);
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, rgb(3,7,18) 0%, rgb(6,15,35) 100%)' }}>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-100 transition-colors duration-200">
       {/* Header */}
-      <nav className="glass-effect border-b border-cyan-500/20">
+      <nav className="bg-black/90 backdrop-blur-sm border-b border-gray-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/">
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 cursor-pointer hover:opacity-80 transition-opacity" data-testid="dashboard-title">
+          <Link to="/" className="hover:opacity-80 transition-opacity">
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500" data-testid="dashboard-title">
               NSTrack
             </h1>
           </Link>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
+          <div className="flex items-center gap-2">
+            <button
               onClick={toggleTheme}
-              className="text-slate-300 hover:text-cyan-400"
-              data-testid="theme-toggle-btn"
+              className="p-2 rounded-full hover:bg-gray-800 text-gray-300 hover:text-cyan-400 transition-colors"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </Button>
-            <Link to="/problems" target="_blank">
-              <Button variant="ghost" className="text-slate-300 hover:text-cyan-400" data-testid="problems-nav-btn">
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+            <Link to="/problems">
+              <Button variant="ghost" className="text-gray-300 hover:text-cyan-400 hover:bg-gray-800/50" data-testid="problems-nav-btn">
                 <Trophy className="w-4 h-4 mr-2" />
                 Problems
               </Button>
             </Link>
-            <Link to="/profile" target="_blank">
-              <Button variant="ghost" className="text-slate-300 hover:text-cyan-400" data-testid="profile-nav-btn">
+            <Link to="/profile">
+              <Button variant="ghost" className="text-gray-300 hover:text-cyan-400 hover:bg-gray-800/50" data-testid="profile-nav-btn">
                 <User className="w-4 h-4 mr-2" />
                 Profile
               </Button>
             </Link>
-            <Button variant="ghost" onClick={handleLogout} className="text-slate-300 hover:text-red-400" data-testid="logout-btn">
-              <LogOut className="w-4 h-4" />
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="text-gray-300 hover:text-red-400 hover:bg-gray-800/50"
+              data-testid="logout-button"
+            >
+              <LogOut className="w-5 h-5" />
             </Button>
           </div>
         </div>
       </nav>
-
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Welcome Section with Progress */}
-        <div className="mb-12 animate-fade-in" data-testid="welcome-section">
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
-                Welcome back, {user?.name?.split(' ')[0]}!
-              </h2>
-              <p className="text-lg text-slate-300">
-                Your Points: <span className="text-cyan-400 font-bold text-xl" data-testid="user-points">{user?.points || 0}</span>
-              </p>
-            </div>
-            {progress.streak > 0 && (
-              <div className="glass-effect rounded-xl px-6 py-4 flex items-center gap-3" data-testid="streak-indicator">
-                <Flame className="w-8 h-8 text-orange-500" />
-                <div>
-                  <p className="text-2xl font-bold text-white">{progress.streak}</p>
-                  <p className="text-sm text-slate-400">Day Streak</p>
-                </div>
-              </div>
-            )}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <section className="mb-12">
+          <div className="bg-black/90 rounded-2xl p-8 shadow-lg border border-gray-800 hover:shadow-xl transition-all hover:border-cyan-500/30">
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+              {localStorage.getItem('firstLogin') === 'false' ? 
+                `Welcome to NSTrack, ${user?.name?.split(' ')[0]}! 🎉` : 
+                `Welcome back, ${user?.name?.split(' ')[0]}!`}
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Your Points: <span className="text-cyan-500 dark:text-cyan-400 font-bold text-xl" data-testid="user-points">{user?.points || 0}</span>
+            </p>
           </div>
-
-          {/* Progress Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="glass-effect rounded-xl p-6">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-slate-300">Overall Progress</p>
-                <span className="text-cyan-400 font-bold">{Math.round(totalProgress)}%</span>
-              </div>
-              <Progress value={totalProgress} className="h-3" data-testid="overall-progress" />
+        </section>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="bg-black/80 rounded-xl p-6 border border-gray-800 hover:border-cyan-500/30 transition-colors hover:shadow-lg">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-gray-400">Overall Progress</p>
+              <span className="text-cyan-500 dark:text-cyan-400 font-bold">{Math.round(totalProgress)}%</span>
             </div>
-            <div className="glass-effect rounded-xl p-6">
-              <p className="text-slate-300 mb-2">Topics Completed</p>
-              <p className="text-3xl font-bold text-white" data-testid="topics-completed">{topicsCompleted}</p>
-            </div>
-            <div className="glass-effect rounded-xl p-6">
-              <p className="text-slate-300 mb-2">Problems Solved</p>
-              <p className="text-3xl font-bold text-white" data-testid="problems-solved">{problemsSolved}</p>
-            </div>
+            <Progress value={totalProgress} className="h-2 bg-gray-100 dark:bg-gray-700" data-testid="overall-progress" />
+          </div>
+          <div className="bg-black/80 rounded-xl p-6 border border-gray-800 hover:border-cyan-500/30 transition-colors hover:shadow-lg">
+            <p className="text-gray-400 mb-2">Topics Completed</p>
+            <p className="text-3xl font-bold text-white" data-testid="topics-completed">{topicsCompleted}</p>
+          </div>
+          <div className="bg-black/80 rounded-xl p-6 border border-gray-800 hover:border-cyan-500/30 transition-colors hover:shadow-lg">
+            <p className="text-gray-400 mb-2">Problems Solved</p>
+            <p className="text-3xl font-bold text-white" data-testid="problems-solved">{problemsSolved}</p>
           </div>
         </div>
-
-        {/* Language Selector */}
-        <div className="mb-12 glass-effect rounded-2xl p-8">
+        <div className="mb-12 bg-black/80 rounded-2xl p-8 border border-gray-800 hover:border-cyan-500/30 transition-colors hover:shadow-xl">
           <h3 className="text-2xl font-bold text-white mb-4">Choose a Programming Language</h3>
-          <p className="text-slate-300 mb-6">Learn any language with our comprehensive internal guides</p>
+          <p className="text-gray-400 mb-6">Learn any language with our comprehensive internal guides</p>
           <Select value={selectedLanguage} onValueChange={handleLanguageSelect}>
-            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white max-w-md" data-testid="language-selector">
+            <SelectTrigger className="bg-white dark:bg-gray-800/50 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 max-w-md" data-testid="language-selector">
               <SelectValue placeholder="Select a language to learn" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-700">
+            <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
               <SelectItem value="python" data-testid="lang-python">Python</SelectItem>
               <SelectItem value="java" data-testid="lang-java">Java</SelectItem>
               <SelectItem value="cpp" data-testid="lang-cpp">C++</SelectItem>
@@ -182,49 +183,47 @@ const Dashboard = () => {
         </div>
 
         {/* Learning Tracks */}
-        <div className="mb-12">
-          <h3 className="text-2xl font-bold text-white mb-6">Select Your Learning Track</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {tracks.map((track) => {
-              const Icon = track.icon;
-              const isSelected = selectedTrack === track.id;
-              return (
-                <div
-                  key={track.id}
-                  onClick={() => handleTrackSelect(track.id)}
-                  data-testid={`track-${track.id}`}
-                  className={`glass-effect rounded-2xl p-6 cursor-pointer transition-all hover-glow ${
-                    isSelected ? 'ring-2 ring-cyan-500' : ''
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${track.color} flex items-center justify-center mb-4`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h4 className="text-xl font-bold text-white mb-2">{track.name}</h4>
-                  <p className="text-slate-300">{track.description}</p>
+        <section className="mb-12">
+          <h3 className="text-2xl font-bold text-white mb-6">Select a Learning Track</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {tracks.map((track) => (
+              <div
+                key={track.id}
+                onClick={() => handleTrackSelect(track.name)}
+                className="group bg-white dark:bg-gray-800/50 rounded-xl p-6 cursor-pointer border border-gray-200 dark:border-gray-700/50 hover:border-cyan-200 dark:hover:border-cyan-500/30 hover:shadow-md transition-all duration-200"
+                data-testid={`track-card-${track.id}`}
+              >
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gradient-to-br ${track.color} text-white`}>
+                  <track.icon className="w-6 h-6" />
                 </div>
-              );
-            })}
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                  {track.name}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">{track.description}</p>
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
 
         {/* Generate Roadmap Button */}
         {selectedTrack && (
           <div className="flex justify-center animate-fade-in">
-            <Button
-              onClick={handleGenerateRoadmap}
-              data-testid="generate-roadmap-btn"
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold px-12 py-6 text-lg rounded-xl"
-            >
-              Generate Roadmap
-            </Button>
+            <div className="bg-gradient-to-r from-gray-900 to-black border border-gray-800 text-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all">
+              <Button
+                className="bg-transparent text-white font-medium px-8 py-3 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 focus:ring-2 focus:ring-cyan-500/30 focus:outline-none"
+                onClick={handleGenerateRoadmap}
+                data-testid="generate-roadmap-btn"
+              >
+                Generate Roadmap
+              </Button>
+            </div>
           </div>
         )}
 
         {/* Motivational Message */}
         {totalProgress > 0 && (
-          <div className="mt-12 glass-effect rounded-2xl p-6 text-center animate-fade-in">
-            <p className="text-lg text-slate-300">
+          <div className="mt-12 bg-black/80 rounded-2xl p-6 text-center border border-gray-800 hover:border-cyan-500/30 transition-colors">
+            <p className="text-lg text-gray-300">
               {totalProgress < 25 && "🌱 Great start! Keep learning consistently."}
               {totalProgress >= 25 && totalProgress < 50 && "🚀 You're making solid progress! Keep going."}
               {totalProgress >= 50 && totalProgress < 75 && "🌟 Excellent work! You're more than halfway there."}
@@ -232,7 +231,7 @@ const Dashboard = () => {
             </p>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };

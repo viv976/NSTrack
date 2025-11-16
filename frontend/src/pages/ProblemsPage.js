@@ -20,6 +20,7 @@ const ProblemsPage = () => {
   const [completedProblems, setCompletedProblems] = useState(new Set());
   const [selectedProblem, setSelectedProblem] = useState(null);
   const [showEditor, setShowEditor] = useState({});
+  const [selectedLanguage, setSelectedLanguage] = useState('javascript');
   const { markProblemComplete: markProblemInProgress } = useProgress();
   const { theme, toggleTheme } = useTheme();
 
@@ -179,7 +180,7 @@ const ProblemsPage = () => {
           }`} 
           style={{ position: 'relative', zIndex: 10 }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div style={{ position: 'relative', zIndex: 30 }}>
               <label className={`text-sm font-medium mb-2 block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-700'}`}>
                 Learning Track
@@ -227,6 +228,32 @@ const ProblemsPage = () => {
                   <SelectItem value="Easy">Easy (+2 points)</SelectItem>
                   <SelectItem value="Medium">Medium (+5 points)</SelectItem>
                   <SelectItem value="Hard">Hard (+10 points)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div style={{ position: 'relative', zIndex: 10 }}>
+              <label className={`text-sm font-medium mb-2 block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-700'}`}>
+                Language
+              </label>
+              <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                <SelectTrigger 
+                  className={theme === 'dark' 
+                    ? 'bg-slate-800/50 border-slate-700 text-white' 
+                    : 'bg-gray-50 border-gray-300 text-slate-900'
+                  } 
+                  data-testid="language-selector"
+                >
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent 
+                  className={theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-300'} 
+                  style={{ zIndex: 9999 }}
+                >
+                  <SelectItem value="javascript">JavaScript</SelectItem>
+                  <SelectItem value="python">Python</SelectItem>
+                  <SelectItem value="java">Java</SelectItem>
+                  <SelectItem value="cpp">C++</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -333,7 +360,7 @@ const ProblemsPage = () => {
                   {showEditor[problem.id] && (
                     <div className="space-y-4" data-testid={`editor-${index}`}>
                       <CodeEditor
-                        language={track === 'web-dev' ? 'javascript' : 'python'}
+                        language={selectedLanguage}
                         problem={problem}
                         onSubmit={(code) => handleCodeSubmit(problem.id, code)}
                       />
