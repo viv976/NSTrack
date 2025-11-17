@@ -11,7 +11,7 @@ import RoadmapPage from './pages/RoadmapPage';
 import ProblemsPage from './pages/ProblemsPage';
 import ProfilePage from './pages/ProfilePage';
 import { Toaster } from 'sonner';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { ProgressProvider } from './context/ProgressContext';
 
 const BACKEND_URL = 'http://localhost:8000';
@@ -22,7 +22,8 @@ export const getAuthHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-function App() {
+const AppContent = () => {
+  const { theme } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -32,38 +33,51 @@ function App() {
       setIsAuthenticated(true);
     }
     setLoading(false);
-    // Force dark theme
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('bg-black', 'text-white');
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[rgb(3,7,18)]">
+      <div className={`flex items-center justify-center min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'bg-[rgb(3,7,18)] text-white' : 'bg-white text-gray-900'}`}>
         <div className="text-cyan-400 text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
+    <ProgressProvider>
+      <div
+        className={`App min-h-screen transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'
+        }`}
+      >
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/login"
+              element={!isAuthenticated ? <LoginPage setAuth={setIsAuthenticated} /> : <Navigate to="/dashboard" />}
+            />
+            <Route
+              path="/signup"
+              element={!isAuthenticated ? <SignupPage setAuth={setIsAuthenticated} /> : <Navigate to="/dashboard" />}
+            />
+            <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+            <Route path="/language/:lang" element={isAuthenticated ? <LanguagePage /> : <Navigate to="/login" />} />
+            <Route path="/roadmap" element={isAuthenticated ? <RoadmapPage /> : <Navigate to="/login" />} />
+            <Route path="/problems" element={isAuthenticated ? <ProblemsPage /> : <Navigate to="/login" />} />
+            <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-right" theme={theme === 'dark' ? 'dark' : 'light'} />
+      </div>
+    </ProgressProvider>
+  );
+};
+
+function App() {
+  return (
     <ThemeProvider>
-      <ProgressProvider>
-        <div className="App min-h-screen bg-black text-white">
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={!isAuthenticated ? <LoginPage setAuth={setIsAuthenticated} /> : <Navigate to="/dashboard" />} />
-              <Route path="/signup" element={!isAuthenticated ? <SignupPage setAuth={setIsAuthenticated} /> : <Navigate to="/dashboard" />} />
-              <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
-              <Route path="/language/:lang" element={isAuthenticated ? <LanguagePage /> : <Navigate to="/login" />} />
-              <Route path="/roadmap" element={isAuthenticated ? <RoadmapPage /> : <Navigate to="/login" />} />
-              <Route path="/problems" element={isAuthenticated ? <ProblemsPage /> : <Navigate to="/login" />} />
-              <Route path="/profile" element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" />} />
-            </Routes>
-          </BrowserRouter>
-          <Toaster position="top-right" theme="dark" />
-        </div>
-      </ProgressProvider>
+      <AppContent />
     </ThemeProvider>
   );
 }

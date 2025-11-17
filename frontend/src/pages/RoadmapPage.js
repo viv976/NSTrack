@@ -7,6 +7,125 @@ import { Loader2, Sparkles, CheckCircle, Lightbulb, Target, Clock, Code, Externa
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+const TRACK_CONFIG = {
+  'web-dev': {
+    label: 'Web Development',
+    focusArea: 'Full-Stack Web Development',
+    summary: 'Build modern websites and web applications',
+    baseTopics: [
+      'Master HTML5 & CSS3 fundamentals (semantic tags, layout, accessibility)',
+      'Deep dive into modern JavaScript (ES6+, async/await, modules)',
+      'Create responsive layouts with Flexbox and CSS Grid',
+      'Build interactive UIs with a frontend framework (React, Vue, or Angular)',
+      'Learn backend fundamentals with Node.js and Express'
+    ],
+    levelTopics: {
+      beginner: [
+        'Follow guided tutorials to build landing pages and dashboards',
+        'Learn Git + GitHub workflows for solo projects',
+        'Practice DOM manipulation and basic API calls'
+      ],
+      intermediate: [
+        'Implement authentication, authorization, and protected routes',
+        'Integrate databases (MongoDB/PostgreSQL) with RESTful APIs',
+        'Optimize performance with code-splitting and caching strategies'
+      ],
+      advanced: [
+        'Design scalable architectures (microservices, event-driven systems)',
+        'Implement CI/CD pipelines and automated testing',
+        'Master advanced accessibility and web performance budgeting'
+      ]
+    }
+  },
+  'app-dev': {
+    label: 'App Development',
+    focusArea: 'Mobile App Development',
+    summary: 'Create mobile applications for iOS and Android',
+    baseTopics: [
+      'Choose a framework (React Native, Flutter, or Swift/Kotlin)',
+      'Understand mobile design patterns (MVC, MVVM, Clean Architecture)',
+      'Work with device APIs (camera, storage, sensors)',
+      'Implement offline storage and synchronization strategies',
+      'Learn app deployment workflows for App Store and Play Store'
+    ],
+    levelTopics: {
+      beginner: [
+        'Build a simple cross-platform app with navigation and forms',
+        'Practice styling with platform-specific components',
+        'Learn how to debug on emulators and physical devices'
+      ],
+      intermediate: [
+        'Integrate native modules and third-party SDKs',
+        'Implement push notifications and deep linking',
+        'Optimize performance and memory usage'
+      ],
+      advanced: [
+        'Adopt clean architecture with dependency injection',
+        'Set up automated builds with Fastlane/GitHub Actions',
+        'Implement advanced animations and accessibility features'
+      ]
+    }
+  },
+  'ai-ml': {
+    label: 'AI / Machine Learning',
+    focusArea: 'AI & Machine Learning Engineering',
+    summary: 'Master artificial intelligence and ML algorithms',
+    baseTopics: [
+      'Strengthen Python for data science (NumPy, Pandas, Matplotlib)',
+      'Review math foundations: linear algebra, probability, calculus basics',
+      'Study core ML algorithms (regression, classification, clustering)',
+      'Learn model evaluation, bias/variance, and feature engineering',
+      'Build end-to-end ML projects with Scikit-learn and TensorFlow/PyTorch'
+    ],
+    levelTopics: {
+      beginner: [
+        'Complete guided notebooks on Kaggle/Google Colab',
+        'Replicate classic datasets (Iris, Titanic, MNIST)',
+        'Learn to clean and visualize datasets effectively'
+      ],
+      intermediate: [
+        'Implement neural networks, CNNs, and transfer learning',
+        'Deploy models using FastAPI/Flask or serverless platforms',
+        'Experiment with hyperparameter tuning and ML pipelines'
+      ],
+      advanced: [
+        'Design production-ready ML systems with monitoring',
+        'Work on NLP/LLM projects and vector databases',
+        'Optimize models with quantization and hardware acceleration'
+      ]
+    }
+  },
+  'dsa-cp': {
+    label: 'DSA & Competitive Programming',
+    focusArea: 'Algorithms & Competitive Programming',
+    summary: 'Excel in data structures and problem-solving',
+    baseTopics: [
+      'Master time complexity analysis and math tricks',
+      'Strengthen core data structures (arrays, stacks, queues, linked lists)',
+      'Learn recursion and divide & conquer strategies',
+      'Practice sorting, searching, and greedy paradigms',
+      'Build strong foundations in dynamic programming and graph theory'
+    ],
+    levelTopics: {
+      beginner: [
+        'Solve array/string problems daily (Two Sum, Valid Parentheses)',
+        'Implement custom data structures from scratch',
+        'Participate in easy-rated contests to build stamina'
+      ],
+      intermediate: [
+        'Master DP patterns (knapsack, LIS, matrix paths)',
+        'Learn advanced graphs (DSU, shortest paths, MST)',
+        'Compete weekly on Codeforces/LeetCode contest mode'
+      ],
+      advanced: [
+        'Study bitmask DP, segment trees, Fenwick trees',
+        'Optimize solutions with heuristics and pruning',
+        'Focus on contest strategy, debugging speed, and editor setups'
+      ]
+    }
+  }
+};
+
 const RoadmapPage = () => {
   // Define generateAIPoweredRoadmap as a static method to ensure it's accessible
   const navigate = useNavigate();
@@ -24,6 +143,7 @@ const RoadmapPage = () => {
     technology: 'all',
     searchQuery: ''
   });
+  const [track, setTrack] = useState(() => localStorage.getItem('selectedTrack') || 'web-dev');
 
   useEffect(() => {
     setFormData(prev => ({
@@ -32,6 +152,19 @@ const RoadmapPage = () => {
       current_level: 'beginner'
     }));
   }, []);
+
+  useEffect(() => {
+    const savedTrack = localStorage.getItem('selectedTrack');
+    if (savedTrack) {
+      setTrack(savedTrack);
+    }
+  }, []);
+
+  const trackOptions = Object.entries(TRACK_CONFIG).map(([value, config]) => ({
+    value,
+    label: config.label,
+    summary: config.summary
+  }));
 
   // Enhanced technology detection with fuzzy matching and context awareness
   const detectTechnologies = (text) => {
@@ -101,8 +234,234 @@ const RoadmapPage = () => {
     return detected;
   };
 
+  const getPracticeProblems = (
+    focusArea,
+    level,
+    filters = {
+      category: 'all',
+      platform: 'all',
+      technology: 'all',
+      searchQuery: ''
+    },
+    trackKey = 'web-dev'
+  ) => {
+    const allProblems = [
+      {
+        id: 1,
+        title: 'Build a Todo App',
+        description: 'Create a responsive todo application with React',
+        difficulty: 'Medium',
+        category: 'projects',
+        platform: 'Frontend Mentor',
+        technology: 'React',
+        link: 'https://reactjs.org/tutorial/tutorial.html',
+        video: 'https://youtube.com/embed/w7ejDZ8SWv8',
+        resources: [
+          'React Documentation: https://reactjs.org/docs/getting-started.html',
+          'React Hooks Guide: https://reactjs.org/docs/hooks-intro.html'
+        ],
+        tracks: ['web-dev']
+      },
+      {
+        id: 2,
+        title: 'Responsive Layout',
+        description: 'Create a responsive layout using CSS Grid and Flexbox',
+        difficulty: 'Easy',
+        category: 'layout',
+        platform: 'Frontend Mentor',
+        technology: 'CSS',
+        link: 'https://www.frontendmentor.io/challenges',
+        video: 'https://youtube.com/embed/0xMQfnTU6oo',
+        resources: [
+          'CSS Grid Guide: https://css-tricks.com/snippets/css/complete-guide-grid/',
+          'Flexbox Froggy: https://flexboxfroggy.com/'
+        ],
+        tracks: ['web-dev']
+      },
+      {
+        id: 3,
+        title: 'REST API with Node.js',
+        description: 'Build a RESTful API with Node.js and Express',
+        difficulty: 'Medium',
+        category: 'backend',
+        platform: 'FreeCodeCamp',
+        technology: 'Node.js',
+        link: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
+        video: 'https://youtube.com/embed/pKd0Rpw7O48',
+        resources: [
+          'Express.js Documentation: https://expressjs.com/',
+          'REST API Best Practices: https://www.freecodecamp.org/news/rest-api-best-practices/'
+        ],
+        tracks: ['web-dev']
+      },
+      {
+        id: 4,
+        title: 'Two Sum',
+        description: 'Find two numbers that add up to a target sum',
+        difficulty: 'Easy',
+        category: 'algorithms',
+        platform: 'LeetCode',
+        technology: 'JavaScript',
+        link: 'https://leetcode.com/problems/two-sum/',
+        video: 'https://youtube.com/embed/KLlXCFG5TnA',
+        resources: [
+          'Big O Notation: https://www.freecodecamp.org/news/big-o-notation-explained/',
+          'JavaScript Array Methods: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'
+        ],
+        tracks: ['web-dev', 'dsa-cp']
+      },
+      {
+        id: 5,
+        title: 'Design Twitter',
+        description: 'Design a simplified version of Twitter',
+        difficulty: 'Hard',
+        category: 'system design',
+        platform: 'Grokking',
+        technology: 'System Design',
+        link: 'https://www.educative.io/courses/grokking-the-system-design-interview',
+        video: 'https://youtube.com/embed/xZ7F_v1Wufk',
+        resources: [
+          'System Design Primer: https://github.com/donnemartin/system-design-primer',
+          'Scalability Basics: https://www.lecloud.net/tagged/scal/'
+        ],
+        tracks: ['web-dev']
+      },
+      {
+        id: 6,
+        title: 'Debug Memory Leak',
+        description: 'Identify and fix a memory leak in a Node.js application',
+        difficulty: 'Hard',
+        category: 'debugging',
+        platform: 'Node.js Docs',
+        technology: 'Node.js',
+        link: 'https://nodejs.org/en/docs/guides/diagnostics/memory/using-memory-cpupprof/',
+        video: 'https://youtube.com/embed/0oAxLayoOWQ',
+        resources: [
+          'Node.js Debugging Guide: https://nodejs.org/en/docs/guides/debugging-getting-started/',
+          'Chrome DevTools: https://developers.google.com/web/tools/chrome-devtools/'
+        ],
+        tracks: ['web-dev']
+      },
+      {
+        id: 7,
+        title: 'React Native Habit Tracker',
+        description: 'Build a cross-platform habit tracker with React Native and AsyncStorage',
+        difficulty: 'Medium',
+        category: 'projects',
+        platform: 'Expo',
+        technology: 'React Native',
+        link: 'https://reactnative.dev/docs/tutorial',
+        video: 'https://youtube.com/embed/0-S5a0eXPoc',
+        resources: [
+          'React Native Docs: https://reactnative.dev/docs/intro-react-native-components',
+          'Expo Guide: https://docs.expo.dev/'
+        ],
+        tracks: ['app-dev']
+      },
+      {
+        id: 8,
+        title: 'Flutter Weather App',
+        description: 'Fetch live weather data and render beautiful cards with Flutter',
+        difficulty: 'Medium',
+        category: 'projects',
+        platform: 'Flutter',
+        technology: 'Flutter',
+        link: 'https://docs.flutter.dev/get-started/codelab',
+        video: 'https://youtube.com/embed/jBBl1tYkUnE',
+        resources: [
+          'Flutter Codelabs: https://codelabs.developers.google.com/?cat=Flutter',
+          'OpenWeather API: https://openweathermap.org/api'
+        ],
+        tracks: ['app-dev']
+      },
+      {
+        id: 9,
+        title: 'MNIST Digit Classifier',
+        description: 'Train and evaluate a neural network to recognize handwritten digits',
+        difficulty: 'Medium',
+        category: 'machine learning',
+        platform: 'Kaggle',
+        technology: 'TensorFlow',
+        link: 'https://www.tensorflow.org/tutorials/quickstart/beginner',
+        video: 'https://youtube.com/embed/bte8Er0QhDg',
+        resources: [
+          'Kaggle MNIST: https://www.kaggle.com/c/digit-recognizer',
+          'TensorFlow Guide: https://www.tensorflow.org/tutorials'
+        ],
+        tracks: ['ai-ml']
+      },
+      {
+        id: 10,
+        title: 'Build an ML Pipeline',
+        description: 'Create a full ML pipeline with data cleaning, training, and deployment',
+        difficulty: 'Hard',
+        category: 'machine learning',
+        platform: 'FastAPI',
+        technology: 'Python',
+        link: 'https://fastapi.tiangolo.com/tutorial/machine-learning/',
+        video: 'https://youtube.com/embed/0RS1N2NtD6w',
+        resources: [
+          'MLflow Guide: https://mlflow.org/docs/latest/index.html',
+          'FastAPI Docs: https://fastapi.tiangolo.com/'
+        ],
+        tracks: ['ai-ml']
+      },
+      {
+        id: 11,
+        title: 'Sliding Window Mastery',
+        description: 'Solve sliding window problems for arrays and strings efficiently',
+        difficulty: 'Medium',
+        category: 'algorithms',
+        platform: 'LeetCode',
+        technology: 'Algorithms',
+        link: 'https://leetcode.com/tag/sliding-window/',
+        video: 'https://youtube.com/embed/8s1tcX5mJ1E',
+        resources: [
+          'Sliding Window Patterns: https://www.educative.io/courses/grokking-the-coding-interview',
+          'LeetCode Discuss Collection: https://leetcode.com/discuss/general-discussion/1064670/Sliding-Window-for-Beginners'
+        ],
+        tracks: ['dsa-cp']
+      },
+      {
+        id: 12,
+        title: 'Dynamic Programming Bootcamp',
+        description: 'Practice classic DP problems (knapsack, LIS, grid paths)',
+        difficulty: 'Hard',
+        category: 'algorithms',
+        platform: 'Codeforces',
+        technology: 'Algorithms',
+        link: 'https://codeforces.com/blog/entry/67679',
+        video: 'https://youtube.com/embed/oBt53YbR9Kk',
+        resources: [
+          'AtCoder DP Contest: https://atcoder.jp/contests/dp',
+          'CP Algorithms: https://cp-algorithms.com/dynamic_programming/basic.html'
+        ],
+        tracks: ['dsa-cp']
+      }
+    ];
+
+    return allProblems.filter((problem) => {
+      const focusMatch = true;
+      const levelMatch =
+        (level === 'beginner' && problem.difficulty === 'Easy') ||
+        (level === 'intermediate' && ['Easy', 'Medium'].includes(problem.difficulty)) ||
+        level === 'advanced';
+
+      const categoryMatch = filters.category === 'all' || problem.category === filters.category;
+      const platformMatch = filters.platform === 'all' || problem.platform === filters.platform;
+      const techMatch = filters.technology === 'all' || problem.technology === filters.technology;
+      const searchMatch =
+        problem.title.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+        problem.description.toLowerCase().includes(filters.searchQuery.toLowerCase());
+
+      const trackMatch = !problem.tracks || problem.tracks.includes(trackKey);
+
+      return focusMatch && levelMatch && categoryMatch && platformMatch && techMatch && searchMatch && trackMatch;
+    });
+  };
+
   // Static method to generate roadmap
-  RoadmapPage.generateAIPoweredRoadmap = (goals, time, level) => {
+  RoadmapPage.generateAIPoweredRoadmap = (goals, time, level, trackKey = 'web-dev') => {
     // Normalize and analyze user input
     const goalsLower = goals.toLowerCase();
     const isBeginner = level === 'beginner';
@@ -111,6 +470,16 @@ const RoadmapPage = () => {
     
     // Initialize path with core fundamentals based on level
     let path = [];
+    const selectedTrack = TRACK_CONFIG[trackKey] || TRACK_CONFIG['web-dev'];
+    const levelKey = isAdvanced ? 'advanced' : isIntermediate ? 'intermediate' : 'beginner';
+
+    if (selectedTrack) {
+      path.push(`Track focus: ${selectedTrack.summary}`);
+      path.push('');
+      selectedTrack.baseTopics.forEach(topic => path.push(topic));
+      selectedTrack.levelTopics?.[levelKey]?.forEach(topic => path.push(topic));
+      path.push('');
+    }
     
     // Detect technologies from user input
     const detectedTech = detectTechnologies(goals);
@@ -467,34 +836,36 @@ const RoadmapPage = () => {
 
     // Determine focus area based on user goals
     // goalsLower is already defined above
-    let focusArea = 'web development';
+    let focusArea = selectedTrack?.focusArea || 'web development';
+    const allowFocusOverride = trackKey === 'web-dev';
     
-    if ((goalsLower.includes('frontend') || goalsLower.includes('front end') || 
-         goalsLower.includes('react') || goalsLower.includes('vue') || 
-         goalsLower.includes('angular') || goalsLower.includes('ui') || 
-         goalsLower.includes('ux') || goalsLower.includes('design')) &&
-        !goalsLower.includes('backend') && !goalsLower.includes('node') && !goalsLower.includes('api')) {
-      focusArea = 'frontend development';
-    } else if ((goalsLower.includes('backend') || goalsLower.includes('back end') || 
-                goalsLower.includes('server') || goalsLower.includes('api') || 
-                goalsLower.includes('database') || goalsLower.includes('node')) &&
-               !goalsLower.includes('frontend') && !goalsLower.includes('react') && 
-               !goalsLower.includes('vue') && !goalsLower.includes('angular')) {
-      focusArea = 'backend development';
-    } else if (path.length > 0) {
-      // If we've identified specific topics, use those to determine focus
-      const frontendKeywords = ['html', 'css', 'javascript', 'react', 'vue', 'angular', 'ui', 'ux', 'design'];
-      const backendKeywords = ['node', 'express', 'api', 'server', 'database', 'mongodb', 'postgres', 'sql'];
-      
-      const frontendCount = frontendKeywords.filter(kw => goalsLower.includes(kw)).length;
-      const backendCount = backendKeywords.filter(kw => goalsLower.includes(kw)).length;
-      
-      if (frontendCount > backendCount) {
-        focusArea = 'frontend-focused development';
-      } else if (backendCount > frontendCount) {
-        focusArea = 'backend-focused development';
-      } else {
-        focusArea = 'web development';
+    if (allowFocusOverride) {
+      if ((goalsLower.includes('frontend') || goalsLower.includes('front end') || 
+           goalsLower.includes('react') || goalsLower.includes('vue') || 
+           goalsLower.includes('angular') || goalsLower.includes('ui') || 
+           goalsLower.includes('ux') || goalsLower.includes('design')) &&
+          !goalsLower.includes('backend') && !goalsLower.includes('node') && !goalsLower.includes('api')) {
+        focusArea = 'frontend development';
+      } else if ((goalsLower.includes('backend') || goalsLower.includes('back end') || 
+                  goalsLower.includes('server') || goalsLower.includes('api') || 
+                  goalsLower.includes('database') || goalsLower.includes('node')) &&
+                 !goalsLower.includes('frontend') && !goalsLower.includes('react') && 
+                 !goalsLower.includes('vue') && !goalsLower.includes('angular')) {
+        focusArea = 'backend development';
+      } else if (path.length > 0) {
+        const frontendKeywords = ['html', 'css', 'javascript', 'react', 'vue', 'angular', 'ui', 'ux', 'design'];
+        const backendKeywords = ['node', 'express', 'api', 'server', 'database', 'mongodb', 'postgres', 'sql'];
+        
+        const frontendCount = frontendKeywords.filter(kw => goalsLower.includes(kw)).length;
+        const backendCount = backendKeywords.filter(kw => goalsLower.includes(kw)).length;
+        
+        if (frontendCount > backendCount) {
+          focusArea = 'frontend-focused development';
+        } else if (backendCount > frontendCount) {
+          focusArea = 'backend-focused development';
+        } else {
+          focusArea = 'web development';
+        }
       }
     }
 
@@ -566,148 +937,18 @@ const RoadmapPage = () => {
       });
     }
 
-    // Helper function to get practice problems based on filters
-    const getPracticeProblems = (focusArea, level, filters) => {
-      const allProblems = [
-        // Frontend Problems
-        {
-          id: 1,
-          title: 'Build a Todo App',
-          description: 'Create a responsive todo application with React',
-          difficulty: 'Medium',
-          category: 'projects',
-          platform: 'Frontend Mentor',
-          technology: 'React',
-          link: 'https://reactjs.org/tutorial/tutorial.html',
-          video: 'https://youtube.com/embed/w7ejDZ8SWv8',
-          resources: [
-            'React Documentation: https://reactjs.org/docs/getting-started.html',
-            'React Hooks Guide: https://reactjs.org/docs/hooks-intro.html'
-          ]
-        },
-        {
-          id: 2,
-          title: 'Responsive Layout',
-          description: 'Create a responsive layout using CSS Grid and Flexbox',
-          difficulty: 'Easy',
-          category: 'layout',
-          platform: 'Frontend Mentor',
-          technology: 'CSS',
-          link: 'https://www.frontendmentor.io/challenges',
-          video: 'https://youtube.com/embed/0xMQfnTU6oo',
-          resources: [
-            'CSS Grid Guide: https://css-tricks.com/snippets/css/complete-guide-grid/',
-            'Flexbox Froggy: https://flexboxfroggy.com/'
-          ]
-        },
-        
-        // Backend Problems
-        {
-          id: 3,
-          title: 'REST API with Node.js',
-          description: 'Build a RESTful API with Node.js and Express',
-          difficulty: 'Medium',
-          category: 'backend',
-          platform: 'FreeCodeCamp',
-          technology: 'Node.js',
-          link: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
-          video: 'https://youtube.com/embed/pKd0Rpw7O48',
-          resources: [
-            'Express.js Documentation: https://expressjs.com/',
-            'REST API Best Practices: https://www.freecodecamp.org/news/rest-api-best-practices/'
-          ]
-        },
-        
-        // Algorithm Problems
-        {
-          id: 4,
-          title: 'Two Sum',
-          description: 'Find two numbers that add up to a target sum',
-          difficulty: 'Easy',
-          category: 'algorithms',
-          platform: 'LeetCode',
-          technology: 'JavaScript',
-          link: 'https://leetcode.com/problems/two-sum/',
-          video: 'https://youtube.com/embed/KLlXCFG5TnA',
-          resources: [
-            'Big O Notation: https://www.freecodecamp.org/news/big-o-notation-explained/',
-            'JavaScript Array Methods: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'
-          ]
-        },
-        
-        // System Design
-        {
-          id: 5,
-          title: 'Design Twitter',
-          description: 'Design a simplified version of Twitter',
-          difficulty: 'Hard',
-          category: 'system design',
-          platform: 'Grokking',
-          technology: 'System Design',
-          link: 'https://www.educative.io/courses/grokking-the-system-design-interview',
-          video: 'https://youtube.com/embed/xZ7F_v1Wufk',
-          resources: [
-            'System Design Primer: https://github.com/donnemartin/system-design-primer',
-            'Scalability Basics: https://www.lecloud.net/tagged/scal/'
-          ]
-        },
-        
-        // Debugging
-        {
-          id: 6,
-          title: 'Debug Memory Leak',
-          description: 'Identify and fix a memory leak in a Node.js application',
-          difficulty: 'Hard',
-          category: 'debugging',
-          platform: 'Node.js Docs',
-          technology: 'Node.js',
-          link: 'https://nodejs.org/en/docs/guides/diagnostics/memory/using-memory-cpupprof/',
-          video: 'https://youtube.com/embed/0oAxLayoOWQ',
-          resources: [
-            'Node.js Debugging Guide: https://nodejs.org/en/docs/guides/debugging-getting-started/',
-            'Chrome DevTools: https://developers.google.com/web/tools/chrome-devtools/'
-          ]
-        }
-      ];
-      
-      // Filter problems based on focus area and level
-      let filteredProblems = allProblems.filter(problem => {
-        // Filter by focus area
-        const focusMatch = 
-          focusArea.includes('frontend') && problem.technology.match(/(React|CSS|JavaScript)/) ||
-          focusArea.includes('backend') && problem.technology.match(/(Node\.js|Database|API)/) ||
-          focusArea === 'web development';
-        
-        // Filter by level
-        const levelMatch = 
-          (level === 'beginner' && problem.difficulty === 'Easy') ||
-          (level === 'intermediate' && ['Easy', 'Medium'].includes(problem.difficulty)) ||
-          (level === 'advanced');
-        
-        // Apply filters
-        const categoryMatch = filters.category === 'all' || problem.category === filters.category;
-        const platformMatch = filters.platform === 'all' || problem.platform === filters.platform;
-        const techMatch = filters.technology === 'all' || problem.technology === filters.technology;
-        const searchMatch = problem.title.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-                           problem.description.toLowerCase().includes(filters.searchQuery.toLowerCase());
-        
-        return focusMatch && levelMatch && categoryMatch && platformMatch && techMatch && searchMatch;
-      });
-      
-      return filteredProblems;
-    };
-
     return {
       title: 'Your Personalized Web Development Roadmap',
-      description: `A ${weeks}-week learning path to ${goals || 'master web development'}`,
+      description: `A ${weeks}-week learning path to ${goals || (selectedTrack?.summary?.toLowerCase() || 'master web development')}`,
       weeks: weeklyRoadmap,
       totalWeeks: weeks,
-      focusAreas: focusArea === 'frontend' ? 'Frontend Development' :
-                 focusArea === 'backend' ? 'Backend Development' :
-                 'Full-Stack Development',
+      focusAreas: focusArea,
       focusArea: focusArea,
       personalizedTips: getPersonalizedTips(goals, level),
-      practiceProblems: getPracticeProblems(focusArea, level)
+      practiceProblems: getPracticeProblems(focusArea, level, undefined, trackKey),
+      trackKey,
+      trackLabel: selectedTrack?.label || 'Web Development',
+      trackSummary: selectedTrack?.summary
     };
   };
 
@@ -719,6 +960,10 @@ const RoadmapPage = () => {
       toast.error('Please enter your learning goals');
       return;
     }
+    if (!track) {
+      toast.error('Please select a learning track');
+      return;
+    }
     
     setLoading(true);
     
@@ -727,7 +972,8 @@ const RoadmapPage = () => {
       const generatedRoadmap = RoadmapPage.generateAIPoweredRoadmap(
         formData.goals,
         formData.time_availability,
-        formData.current_level
+        formData.current_level,
+        track
       );
       
       setRoadmap(generatedRoadmap);
@@ -753,6 +999,11 @@ const RoadmapPage = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleTrackChange = (value) => {
+    setTrack(value);
+    localStorage.setItem('selectedTrack', value);
   };
 
   const renderWeek = (weekData) => {
@@ -812,7 +1063,14 @@ const RoadmapPage = () => {
             {step === 'questions' ? 'Create Your Learning Roadmap' : roadmap?.title || 'Your Learning Path'}
           </h1>
           {step === 'roadmap' && roadmap?.description && (
-            <p className="text-gray-600 dark:text-gray-300">{roadmap.description}</p>
+              <div className="space-y-2">
+                <p className="text-gray-600 dark:text-gray-300">{roadmap.description}</p>
+                {roadmap.trackSummary && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {roadmap.trackSummary}
+                  </p>
+                )}
+              </div>
           )}
         </div>
 
@@ -833,6 +1091,27 @@ const RoadmapPage = () => {
                   placeholder="E.g., Build a portfolio website, Get a job at a tech company, Master algorithms..."
                   required
                 />
+              </div>
+
+              <div>
+                <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Which learning track are you focusing on? *
+                </Label>
+                <Select value={track} onValueChange={handleTrackChange} required>
+                  <SelectTrigger className="mt-2 bg-white dark:bg-gray-700/50 border-gray-300 dark:border-gray-600">
+                    <SelectValue placeholder="Select a track" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-gray-800">
+                    {trackOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  {TRACK_CONFIG[track]?.summary || 'Choose where you want to focus your efforts.'}
+                </p>
               </div>
 
               <div>
@@ -918,6 +1197,9 @@ const RoadmapPage = () => {
                   </div>
                   <p className="text-gray-300">
                     {roadmap.focusAreas}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {roadmap.trackLabel}
                   </p>
                 </div>
                 <div className="bg-white/5 p-6 rounded-xl border border-gray-200/10">
@@ -1039,7 +1321,7 @@ const RoadmapPage = () => {
 
                 {/* Problems Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {getPracticeProblems(roadmap.focusArea, formData.current_level, problemFilters).map((problem) => (
+                  {getPracticeProblems(roadmap.focusArea, formData.current_level, problemFilters, roadmap.trackKey).map((problem) => (
                     <div key={problem.id} className="bg-white/5 rounded-xl border border-gray-200/10 hover:border-cyan-500/50 transition-all overflow-hidden">
                       <div className="p-5">
                         <div className="flex justify-between items-start mb-3">
@@ -1116,7 +1398,7 @@ const RoadmapPage = () => {
                 </div>
                 
                 {/* No Results Message */}
-                {getPracticeProblems(roadmap.focusArea, formData.current_level, problemFilters).length === 0 && (
+                {getPracticeProblems(roadmap.focusArea, formData.current_level, problemFilters, roadmap.trackKey).length === 0 && (
                   <div className="text-center py-10">
                     <p className="text-gray-400">No problems match your current filters. Try adjusting your search criteria.</p>
                     <Button 

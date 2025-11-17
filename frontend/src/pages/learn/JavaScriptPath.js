@@ -526,7 +526,6 @@ class UserService {
   
   getUser(id) {
     return this.apiClient.get(`/users/${id}`);
-  }
 }
 
 // userService.test.js

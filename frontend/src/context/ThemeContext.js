@@ -1,30 +1,50 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 const ThemeContext = createContext();
 
+const isBrowser = typeof window !== 'undefined';
+
+const getInitialTheme = () => {
+  if (!isBrowser) return 'light';
+
+  const storedTheme = localStorage.getItem('theme');
+  if (storedTheme === 'dark' || storedTheme === 'light') {
+    return storedTheme;
+  }
+
+  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)')?.matches;
+  return prefersDark ? 'dark' : 'light';
+};
+
 export const ThemeProvider = ({ children }) => {
-  // Always use dark theme
-  const theme = 'dark';
+  const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
-    // Force dark theme on the root element
-    document.documentElement.classList.add('dark');
-    document.body.classList.add('bg-black', 'text-white');
-    
-    // Set theme in localStorage for consistency
-    localStorage.setItem('theme', 'dark');
-  }, []);
+    if (!isBrowser) return;
 
-  // No-op since we're forcing dark theme
-  const toggleTheme = () => {};
+    const root = document.documentElement;
+    const body = document.body;
+    const isDark = theme === 'dark';
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className="min-h-screen bg-black text-white">
-        {children}
-      </div>
-    </ThemeContext.Provider>
-  );
+    root.classList.toggle('dark', isDark);
+
+    body.classList.remove('bg-black', 'text-white', 'bg-white', 'text-gray-900');
+    if (isDark) {
+      body.classList.add('bg-black', 'text-white');
+    } else {
+      body.classList.add('bg-white', 'text-gray-900');
+    }
+
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme]);
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
 export const useTheme = () => {

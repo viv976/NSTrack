@@ -58,6 +58,17 @@ const HomePage = () => {
                 Login
               </Button>
               <Button
+                variant="outline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/signup', { replace: false });
+                }}
+                className="border-cyan-500 text-cyan-600 hover:bg-cyan-50 dark:border-cyan-400 dark:text-cyan-300 dark:hover:bg-cyan-500/10"
+                data-testid="home-nav-signup-btn"
+              >
+                Sign Up
+              </Button>
+              <Button
                 onClick={(e) => {
                   e.preventDefault();
                   navigate('/signup', { replace: false });

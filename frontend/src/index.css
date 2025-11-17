@@ -5,17 +5,17 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-rgb: 0, 0, 0;
-  --card-rgb: 10, 10, 10;
-  --card-border-rgb: 38, 38, 38;
+  --foreground-rgb: 15, 23, 42;
+  --background-rgb: 248, 250, 252;
+  --card-rgb: 255, 255, 255;
+  --card-border-rgb: 226, 232, 240;
   --primary-rgb: 34, 211, 238; /* cyan-400 */
   --primary-hover-rgb: 6, 182, 212; /* cyan-500 */
   --accent-foreground: 210 100% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 100% 98%;
-  --border: 38, 38, 38;
-  --input: 38, 38, 38;
+  --border: 226, 232, 240;
+  --input: 226, 232, 240;
   --ring: 199 89% 48%;
   --radius: 0.5rem;
 }
@@ -24,26 +24,22 @@
   * {
     @apply border-border;
   }
-  
-  body {
-    @apply bg-black text-white min-h-screen;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
-  }
-}
 
-@layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-screen bg-white text-gray-900;
     font-family: 'Inter', sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  .dark body {
+    @apply bg-[#030712] text-white;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Space Grotesk', sans-serif;
   }
 }
