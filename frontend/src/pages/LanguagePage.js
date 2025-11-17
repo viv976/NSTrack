@@ -274,6 +274,8 @@ const LanguagePage = () => {
                             hint={code.hint}
                             solution={code.solution}
                             language={code.language}
+                            expectedOutput={code.expectedOutput}
+                            testCases={code.testCases}
                             onComplete={() => handlePracticeComplete(section.id, 'coding', index)}
                           />
                         ))}

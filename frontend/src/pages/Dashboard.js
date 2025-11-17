@@ -101,7 +101,20 @@ const Dashboard = () => {
               NSTrack
             </h1>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 flex-wrap justify-end">
+            <div className="hidden md:block">
+              <Select value={selectedLanguage} onValueChange={handleLanguageSelect}>
+                <SelectTrigger className="w-[220px] bg-gray-900/70 border-gray-800 text-slate-200 hover:border-cyan-500/50 transition-colors" data-testid="language-nav-selector">
+                  <SelectValue placeholder="Languages" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-900 border-gray-800 text-slate-200">
+                  <SelectItem value="python">Python</SelectItem>
+                  <SelectItem value="java">Java</SelectItem>
+                  <SelectItem value="cpp">C++</SelectItem>
+                  <SelectItem value="javascript">JavaScript</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-gray-800 text-gray-300 hover:text-cyan-400 transition-colors"
@@ -166,18 +179,18 @@ const Dashboard = () => {
             <p className="text-3xl font-bold text-white" data-testid="problems-solved">{problemsSolved}</p>
           </div>
         </div>
-        <div className="mb-12 bg-black/80 rounded-2xl p-8 border border-gray-800 hover:border-cyan-500/30 transition-colors hover:shadow-xl">
-          <h3 className="text-2xl font-bold text-white mb-4">Choose a Programming Language</h3>
-          <p className="text-gray-400 mb-6">Learn any language with our comprehensive internal guides</p>
+        {/* Mobile Language Selector */}
+        <div className="md:hidden mb-12 bg-black/80 rounded-2xl p-6 border border-gray-800">
+          <h3 className="text-xl font-bold text-white mb-3">Languages</h3>
           <Select value={selectedLanguage} onValueChange={handleLanguageSelect}>
-            <SelectTrigger className="bg-white dark:bg-gray-800/50 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 max-w-md" data-testid="language-selector">
-              <SelectValue placeholder="Select a language to learn" />
+            <SelectTrigger className="bg-white/10 border-gray-700 text-gray-100" data-testid="language-selector-mobile">
+              <SelectValue placeholder="Select a language" />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-              <SelectItem value="python" data-testid="lang-python">Python</SelectItem>
-              <SelectItem value="java" data-testid="lang-java">Java</SelectItem>
-              <SelectItem value="cpp" data-testid="lang-cpp">C++</SelectItem>
-              <SelectItem value="javascript" data-testid="lang-javascript">JavaScript</SelectItem>
+            <SelectContent className="bg-gray-900 border-gray-800 text-gray-100">
+              <SelectItem value="python">Python</SelectItem>
+              <SelectItem value="java">Java</SelectItem>
+              <SelectItem value="cpp">C++</SelectItem>
+              <SelectItem value="javascript">JavaScript</SelectItem>
             </SelectContent>
           </Select>
         </div>

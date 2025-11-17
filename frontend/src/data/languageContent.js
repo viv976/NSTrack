@@ -17,18 +17,18 @@ export const languageRoadmaps = {
             content: `Python is a high-level, interpreted programming language known for its simplicity and readability. Created by Guido van Rossum in 1991, it emphasizes code readability with significant use of whitespace.
 
 **Why Learn Python?**
-• Easy to learn and read (beginner-friendly syntax)
-• Versatile (web, data science, AI, automation, scripting)
-• Huge ecosystem of libraries and frameworks
-• High demand in job market
-• Strong community support
+- Easy to learn and read (beginner-friendly syntax)
+- Versatile (web, data science, AI, automation, scripting)
+- Huge ecosystem of libraries and frameworks
+- High demand in job market
+- Strong community support
 
 **Where is Python Used?**
-• Web Development: Django, Flask, FastAPI
-• Data Science & Analytics: Pandas, NumPy, Matplotlib
-• Machine Learning & AI: TensorFlow, PyTorch, scikit-learn
-• Automation & Scripting: File management, web scraping
-• Desktop Applications: Tkinter, PyQt`,
+- Web Development: Django, Flask, FastAPI
+- Data Science & Analytics: Pandas, NumPy, Matplotlib
+- Machine Learning & AI: TensorFlow, PyTorch, scikit-learn
+- Automation & Scripting: File management, web scraping
+- Desktop Applications: Tkinter, PyQt`,
             example: `# Python's simplicity - Hello World
 print("Hello, World!")
 
@@ -39,11 +39,11 @@ print("Hello, World!")
             content: `**Installation Steps:**
 
 1. **Download Python**
-   • Visit python.org
-   • Download latest version (Python 3.11+)
-   • Windows: Run installer, check "Add Python to PATH"
-   • Mac: Use Homebrew or official installer
-   • Linux: Usually pre-installed
+   - Visit python.org
+   - Download latest version (Python 3.11+)
+   - Windows: Run installer, check "Add Python to PATH"
+   - Mac: Use Homebrew or official installer
+   - Linux: Usually pre-installed
 
 2. **Verify Installation**
    Open terminal/command prompt and type:`,
@@ -87,15 +87,15 @@ print("Nice to meet you, " + name + "!")
             content: `Python syntax is clean and readable. Here are the key rules:
 
 **1. Indentation is Mandatory**
-   • Use 4 spaces (not tabs) for indentation
-   • Indentation defines code blocks
+   - Use 4 spaces (not tabs) for indentation
+   - Indentation defines code blocks
    
 **2. Comments**
-   • Single line: Use #
-   • Multi-line: Use ''' or """
+   - Single line: Use #
+   - Multi-line: Use ''' or """
    
 **3. Case Sensitive**
-   • \`Name\` and \`name\` are different variables`,
+   - \`Name\` and \`name\` are different variables`,
             example: `# This is a single-line comment
 
 """
@@ -121,16 +121,16 @@ print(Name)  # Outputs: Bob`
             content: `Variables store data. Python automatically determines the type.
 
 **Basic Data Types:**
-• **int**: Whole numbers (1, 42, -10)
-• **float**: Decimal numbers (3.14, -0.5)
-• **str**: Text ("Hello", 'Python')
-• **bool**: True or False
+- **int**: Whole numbers (1, 42, -10)
+- **float**: Decimal numbers (3.14, -0.5)
+- **str**: Text ("Hello", 'Python')
+- **bool**: True or False
 
 **Variable Naming Rules:**
-• Start with letter or underscore
-• Can contain letters, numbers, underscore
-• Case sensitive
-• Avoid Python keywords`,
+- Start with letter or underscore
+- Can contain letters, numbers, underscore
+- Case sensitive
+- Avoid Python keywords`,
             example: `# Creating variables (no declaration needed!)
 age = 25                    # int
 height = 5.9                # float
@@ -415,17 +415,17 @@ print_info(name="Alice", age=25, city="NYC")`
             content: `JavaScript is a high-level, interpreted programming language that runs in web browsers and on servers (Node.js).
 
 **Why Learn JavaScript?**
-• Powers interactive websites
-• Full-stack development (frontend + backend)
-• Huge job market demand
-• Vibrant ecosystem (npm)
-• Cross-platform (web, mobile, desktop)
+- Powers interactive websites
+- Full-stack development (frontend + backend)
+- Huge job market demand
+- Vibrant ecosystem (npm)
+- Cross-platform (web, mobile, desktop)
 
 **Where is JavaScript Used?**
-• Frontend: React, Vue, Angular
-• Backend: Node.js, Express
-• Mobile: React Native
-• Desktop: Electron`,
+- Frontend: React, Vue, Angular
+- Backend: Node.js, Express
+- Mobile: React Native
+- Desktop: Electron`,
             example: `// JavaScript runs everywhere!
 
 // In Browser
@@ -435,6 +435,186 @@ alert("Welcome!");
 // Basic calculation
 let result = 5 + 10;
 console.log(result);  // 15`
+          }
+        ]
+      }
+    ]
+  },
+
+  cpp: {
+    title: 'C++ Mastery Roadmap',
+    description: 'From zero to production-ready C++ with focus on problem solving, STL, and modern idioms.',
+    sections: [
+      {
+        id: 'intro',
+        phase: 'Phase 1: Foundations',
+        title: '1. Getting Started with C++',
+        duration: '2 days',
+        difficulty: 'Beginner',
+        topics: [
+          {
+            name: 'Why C++ Still Matters',
+            content: `C++ powers performance-critical software: game engines, trading systems, operating systems, embedded firmware, and competitive programming. Compared to Python/JavaScript it gives you fine-grained control over memory, determinism, and compilation targets. Modern C++ (C++17/C++20) also adds high-level features (auto, range-based loops, smart pointers) without sacrificing speed.`,
+            example: `// C++ Hello World (main.cpp)
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, C++!" << std::endl;
+    return 0;
+}
+
+// Compile & run (terminal)
+// g++ -std=c++17 main.cpp -o app
+// ./app`
+          },
+          {
+            name: 'Setting Up Your Toolchain',
+            content: `Install a modern compiler (GCC, Clang, MSVC) and a build system (CMake or simple g++ commands). On macOS use Homebrew (brew install gcc). On Windows install MSYS2 or Visual Studio Build Tools. Make sure \`g++ --version\` or \`clang++ --version\` works.`,
+            example: `// Checking compiler versions
+g++ --version
+clang++ --version
+
+// Typical folder structure
+project/
+├── include/   // headers
+├── src/       // .cpp files
+└── CMakeLists.txt`
+          },
+          {
+            name: 'Your First Program with I/O',
+            content: `Learn about \`std::cout\` and \`std::cin\` from <iostream>. Understand the need for \`std::\` namespace or use \`using namespace std;\` in small demos (avoid in headers).`,
+            example: `#include <iostream>
+#include <string>
+
+int main() {
+    std::string name;
+    std::cout << "Enter your name: ";
+    std::getline(std::cin, name);
+    std::cout << "Welcome, " << name << "!" << std::endl;
+    return 0;
+}`
+          }
+        ]
+      },
+      {
+        id: 'syntax',
+        phase: 'Phase 1: Core Syntax',
+        title: '2. Types, Memory & Control Flow',
+        duration: '3-4 days',
+        difficulty: 'Beginner',
+        topics: [
+          {
+            name: 'Primitive Types & References',
+            content: `Understand \`int\`, \`long long\`, \`double\`, \`char\`, \`bool\`, and fixed-width types like \`std::int64_t\`. Learn about references (&) versus pointers (*), stack vs heap allocation, and RAII (resource acquisition is initialization).`,
+            example: `int age = 21;
+double pi = 3.14159;
+char grade = 'A';
+bool isReady = true;
+
+int value = 10;
+int &ref = value;   // reference
+int *ptr = &value;  // pointer
+
+ref = 20;           // value becomes 20
+*ptr = 30;          // value becomes 30`
+          },
+          {
+            name: 'Control Flow & Loops',
+            content: `C++ control flow resembles C/Java but offers range-based loops and switch with fall-through. Practice for/while loops plus \`break\`/\`continue\`.`,
+            example: `for (int i = 0; i < 5; ++i) {
+    std::cout << i << " ";
+}
+std::cout << std::endl;
+
+std::vector<int> nums {1, 2, 3};
+for (int n : nums) {
+    std::cout << n << " ";
+}
+
+int choice;
+std::cin >> choice;
+switch (choice) {
+    case 1: std::cout << "Start"; break;
+    case 2: std::cout << "Stop"; break;
+    default: std::cout << "Unknown";
+}`
+          },
+          {
+            name: 'Functions & Header Files',
+            content: `Split declarations (.h/.hpp) from definitions (.cpp). Learn default arguments, function overloading, pass-by-value vs pass-by-reference.`,
+            example: `// math_utils.h
+int add(int a, int b);
+int add(int a, int b, int c);
+
+// math_utils.cpp
+int add(int a, int b) { return a + b; }
+int add(int a, int b, int c) { return a + b + c; }
+
+// main.cpp
+#include "math_utils.h"
+int main() { std::cout << add(2,3) << std::endl; }`
+          }
+        ]
+      },
+      {
+        id: 'oop',
+        phase: 'Phase 2: Applied Skills',
+        title: '3. OOP & STL Essentials',
+        duration: '4-5 days',
+        difficulty: 'Intermediate',
+        topics: [
+          {
+            name: 'Classes, Constructors & Destructors',
+            content: `Create classes with private members, public methods, constructors, destructors, and initializer lists. Understand copy vs move semantics at a high level.`,
+            example: `class Player {
+private:
+    std::string name;
+    int score;
+public:
+    Player(std::string n, int s) : name(std::move(n)), score(s) {}
+    void addScore(int delta) { score += delta; }
+    int getScore() const { return score; }
+};
+
+int main() {
+    Player p("Nova", 42);
+    p.addScore(8);
+    std::cout << p.getScore();
+}`
+          },
+          {
+            name: 'Standard Template Library (STL)',
+            content: `Leverage \`std::vector\`, \`std::array\`, \`std::map\`, \`std::unordered_map\`, \`std::string\`, and algorithms like \`std::sort\`, \`std::accumulate\`. STL is critical for CP and production systems.`,
+            example: `#include <vector>
+#include <algorithm>
+
+std::vector<int> nums {5, 2, 9, 1};
+std::sort(nums.begin(), nums.end());
+for (int x : nums) std::cout << x << " "; // 1 2 5 9
+
+#include <unordered_map>
+std::unordered_map<std::string, int> freq;
+freq["python"]++;
+freq["cpp"]++;
+`
+          },
+          {
+            name: 'Problem-Solving Workflow',
+            content: `Combine STL + algorithms to tackle coding problems. Practice reading input quickly, using \`std::ios::sync_with_stdio(false)\`, and writing clean functions.`,
+            example: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n; cin >> n;
+    vector<int> a(n);
+    for (int &x : a) cin >> x;
+    sort(a.begin(), a.end());
+    cout << a[n/2];
+    return 0;
+}`
           }
         ]
       }

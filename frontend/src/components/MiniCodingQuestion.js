@@ -4,7 +4,7 @@ import { Code, CheckCircle2, Lightbulb, Eye, EyeOff } from 'lucide-react';
 import CodeEditor from './CodeEditor';
 import { toast } from 'sonner';
 
-const MiniCodingQuestion = ({ question, hint, solution, language, onComplete }) => {
+const MiniCodingQuestion = ({ question, hint, solution, language, expectedOutput, testCases, onComplete }) => {
   const [showEditor, setShowEditor] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
@@ -84,6 +84,10 @@ const MiniCodingQuestion = ({ question, hint, solution, language, onComplete }) 
 
           <CodeEditor
             language={language}
+            problem={{
+              expectedOutput,
+              testCases
+            }}
             onSubmit={handleSubmit}
           />
         </div>
