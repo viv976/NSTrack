@@ -4,100 +4,30 @@ export const practiceQuestions = {
   python: {
     intro: {
       mcqs: [
-        {
-          question: 'What type of programming language is Python?',
-          options: [
-            'Compiled, low-level',
-            'Interpreted, high-level',
-            'Assembly language',
-            'Machine language'
-          ],
-          correctAnswer: 1,
-          explanation: 'Python is an interpreted, high-level programming language known for its simplicity and readability.'
-        },
-        {
-          question: 'Which of the following is NOT a common use case for Python?',
-          options: [
-            'Web Development',
-            'Data Science',
-            'Device Drivers',
-            'Machine Learning'
-          ],
-          correctAnswer: 2,
-          explanation: 'While Python can be used for many things, device drivers are typically written in lower-level languages like C for performance reasons.'
-        },
-        {
-          question: 'What is the correct file extension for Python files?',
-          options: ['.pt', '.py', '.python', '.pyt'],
-          correctAnswer: 1,
-          explanation: 'Python files use the .py extension.'
-        }
+        { question: 'What type of programming language is Python?', options: ['Compiled, low-level', 'Interpreted, high-level', 'Assembly language', 'Machine language'], correctAnswer: 1, explanation: 'Python is an interpreted, high-level programming language.' },
+        { question: 'Which of the following is NOT a common use case for Python?', options: ['Web Development', 'Data Science', 'Device Drivers', 'Machine Learning'], correctAnswer: 2, explanation: 'Device drivers are typically written in lower-level languages.' },
+        { question: 'What is the correct file extension for Python files?', options: ['.pt', '.py', '.python', '.pyt'], correctAnswer: 1, explanation: 'Python files use the .py extension.' },
+        { question: 'Which data structure preserves insertion order since Python 3.7?', options: ['set', 'list', 'dict', 'tuple'], correctAnswer: 2, explanation: 'dict preserves insertion order as of CPython 3.7.' },
+        { question: 'Which operator is used for floor division?', options: ['/', '//', '%', '**'], correctAnswer: 1, explanation: 'Floor division uses // and returns the integer quotient.' }
       ],
       coding: [
-        {
-          question: 'Write a program that prints "Hello, Python!" to the console.',
-          hint: 'Use the print() function',
-          solution: 'print("Hello, Python!")',
-          language: 'python',
-          expectedOutput: 'Hello, Python!'
-        },
-        {
-          question: 'Create a program that asks for your age and prints it back.',
-          hint: 'Use input() to get user input',
-          solution: 'age = input("Enter your age: ")\nprint("Your age is:", age)',
-          language: 'python',
-          expectedOutput: 'Your age is: 25',
-          testCases: [
-            {
-              input: '25',
-              output: 'Your age is: 25',
-              explanation: 'Should echo the provided age.'
-            }
-          ]
-        }
+        { question: 'Write a program that prints "Hello, Python!" to the console.', hint: 'Use the print() function', solution: 'print("Hello, Python!")', language: 'python', expectedOutput: 'Hello, Python!' },
+        { question: 'Create a program that asks for your age and prints it back.', hint: 'Use input() to get user input', solution: 'age = input("Enter your age: ")\nprint("Your age is:", age)', language: 'python', expectedOutput: 'Your age is: 25', testCases: [{ input: '25', output: 'Your age is: 25', explanation: 'Should echo the provided age.' }] },
+        { question: 'Read numbers separated by space and print their sum.', hint: 'Use map and sum', solution: 'nums = list(map(int, input().split()))\nprint(sum(nums))', language: 'python', expectedOutput: '6', testCases: [{ input: '1 2 3', output: '6' }] }
       ]
     },
     syntax: {
       mcqs: [
-        {
-          question: 'How many spaces should you use for indentation in Python?',
-          options: ['2 spaces', '4 spaces', '8 spaces', 'Any number'],
-          correctAnswer: 1,
-          explanation: 'Python convention (PEP 8) recommends 4 spaces for indentation.'
-        },
-        {
-          question: 'Which symbol is used for single-line comments in Python?',
-          options: ['//', '/* */', '#', '--'],
-          correctAnswer: 2,
-          explanation: 'Python uses # for single-line comments.'
-        },
-        {
-          question: 'Is Python case-sensitive?',
-          options: [
-            'Yes, Name and name are different',
-            'No, Name and name are the same',
-            'Only for variables',
-            'Only for functions'
-          ],
-          correctAnswer: 0,
-          explanation: 'Python is case-sensitive, meaning Name and name are treated as different identifiers.'
-        }
+        { question: 'How many spaces should you use for indentation in Python?', options: ['2 spaces', '4 spaces', '8 spaces', 'Any number'], correctAnswer: 1, explanation: 'PEP8 recommends 4 spaces.' },
+        { question: 'Which symbol is used for single-line comments in Python?', options: ['//', '/* */', '#', '--'], correctAnswer: 2, explanation: 'Python uses # for single-line comments.' },
+        { question: 'Is Python case-sensitive?', options: ['Yes, Name and name are different', 'No, Name and name are the same', 'Only for variables', 'Only for functions'], correctAnswer: 0, explanation: 'Python is case-sensitive.' },
+        { question: 'Which of these is a mutable type?', options: ['tuple', 'str', 'list', 'int'], correctAnswer: 2, explanation: 'Lists are mutable.' },
+        { question: 'What does the // operator do?', options: ['True division', 'Floor division', 'Modulo', 'Exponentiation'], correctAnswer: 1, explanation: 'Floor division returns the integer quotient.' }
       ],
       coding: [
-        {
-          question: 'Create three variables: name (string), age (int), and height (float). Print them all.',
-          hint: 'Variables don\'t need type declarations in Python',
-          solution: 'name = "Alice"\nage = 25\nheight = 5.6\nprint(name, age, height)',
-          language: 'python',
-          expectedOutput: 'Alice 25 5.6'
-        },
-        {
-          question: 'Create a variable x with value 10, then reassign it to "Hello". Print both values.',
-          hint: 'Python is dynamically typed - variables can change types',
-          solution: 'x = 10\nprint(x)\nx = "Hello"\nprint(x)',
-          language: 'python',
-          expectedOutput: '10\nHello'
-        }
+        { question: 'Create three variables: name (string), age (int), and height (float). Print them all.', hint: 'Variables don\'t need type declarations in Python', solution: 'name = "Alice"\nage = 25\nheight = 5.6\nprint(name, age, height)', language: 'python', expectedOutput: 'Alice 25 5.6' },
+        { question: 'Create a variable x with value 10, then reassign it to "Hello". Print both values.', hint: 'Python is dynamically typed', solution: 'x = 10\nprint(x)\nx = "Hello"\nprint(x)', language: 'python', expectedOutput: '10\nHello' },
+        { question: 'Demonstrate a list comprehension that doubles values in [1,2,3]', hint: 'Use [x*2 for x in lst]', solution: 'lst = [1,2,3]\nprint([x*2 for x in lst])', language: 'python', expectedOutput: '[2, 4, 6]' }
       ]
     },
     operators: {

@@ -59,7 +59,10 @@ const SignupPage = ({ setAuth }) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-black">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-black relative overflow-hidden">
+      <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none">
+        <source src="/background-video.mp4" type="video/mp4" />
+      </video>
       <ConfettiCelebration show={showConfetti} onComplete={() => setShowConfetti(false)} />
       
       <Link to="/" className="absolute top-6 left-6">
@@ -68,7 +71,7 @@ const SignupPage = ({ setAuth }) => {
         </Button>
       </Link>
       
-      <div className="w-full max-w-md animate-fade-in">
+  <div className="w-full max-w-md animate-fade-in relative z-10">
         {showWelcome && (
           <div className="bg-gray-900/90 rounded-2xl p-6 mb-6 text-center border border-gray-800">
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">

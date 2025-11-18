@@ -4,14 +4,14 @@ import { Button } from '../components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import { Progress } from '../components/ui/progress';
 import { Badge } from '../components/ui/badge';
-import { BookOpen, Code2, CheckCircle2, Circle, Lock, Trophy, Play, Award, X, RotateCcw } from 'lucide-react';
+import { BookOpen, Code2, CheckCircle2, Circle, Lock, Trophy, Play, X, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProgress } from '../context/ProgressContext';
 import { languageRoadmaps } from '../data/languageContent';
-import { practiceQuestions } from '../data/practiceQuestions';
 import CodeEditor from '../components/CodeEditor';
 import MCQQuestion from '../components/MCQQuestion';
 import MiniCodingQuestion from '../components/MiniCodingQuestion';
+import { practiceQuestions } from '../data/practiceQuestions';
 
 const LanguagePage = () => {
   const { lang } = useParams();
@@ -22,7 +22,7 @@ const LanguagePage = () => {
   const { progress, markTopicComplete, getTopicProgress, resetLanguageProgress } = useProgress();
   
   const roadmap = languageRoadmaps[lang];
-  const questions = practiceQuestions[lang] || {};
+  // practice questions removed from roadmap sections
   const completedTopics = progress.completedTopics[lang] || {};
   const totalTopics = roadmap?.sections.reduce((acc, section) => acc + section.topics.length, 0) || 0;
   const completedCount = Object.keys(completedTopics).length;
@@ -91,6 +91,21 @@ const LanguagePage = () => {
       </div>
     );
   }
+
+  // Close handler: try to go back in history; if no history, go to dashboard
+  const handleClose = () => {
+    try {
+      // If there is history to go back to, navigate back
+      if (window.history && window.history.length > 1) {
+        navigate(-1);
+        return;
+      }
+    } catch (e) {
+      // ignore and fallback
+    }
+    // fallback route (dashboard is a safe internal route)
+    navigate('/dashboard');
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -234,54 +249,39 @@ const LanguagePage = () => {
                 })}
               </div>
 
-              {/* Practice Questions Section */}
-              {isSectionCompleted(section.id) && questions[section.id] && (
-                <div className="border-t border-cyan-500/30 pt-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Award className="w-6 h-6 text-yellow-500" />
-                    <h3 className="text-2xl font-bold text-white">Practice Questions</h3>
+              {/* Practice questions for Phase 1: show a small set after the section is completed */}
+              {isSectionCompleted(section.id) && (
+                <div className="mt-6 space-y-4">
+                  <h4 className="text-lg font-semibold text-white">Practice: Full Set (MCQs + Coding)</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Render all MCQs for the section (expecting up to 5) */}
+                    {practiceQuestions[lang] && practiceQuestions[lang][section.id]?.mcqs?.map((q, idx) => (
+                      <MCQQuestion
+                        key={`mcq-${idx}`}
+                        question={q.question}
+                        options={q.options}
+                        correctAnswer={q.correctAnswer}
+                        explanation={q.explanation}
+                        onComplete={() => handlePracticeComplete(section.id, 'mcq', idx)}
+                      />
+                    ))}
+
+                    {/* Render up to 3 coding mini questions for the section */}
+                    <div className="space-y-4">
+                      {practiceQuestions[lang] && practiceQuestions[lang][section.id]?.coding?.slice(0,3)?.map((c, idx) => (
+                        <MiniCodingQuestion
+                          key={`code-${idx}`}
+                          question={c.question}
+                          hint={c.hint}
+                          solution={c.solution}
+                          language={c.language}
+                          expectedOutput={c.expectedOutput}
+                          testCases={c.testCases}
+                          onComplete={() => handlePracticeComplete(section.id, 'coding', idx)}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-slate-300 mb-6">Test your knowledge with these questions before moving to the next section!</p>
-
-                  {/* MCQ Questions */}
-                  {questions[section.id].mcqs && questions[section.id].mcqs.length > 0 && (
-                    <div className="mb-8">
-                      <h4 className="text-xl font-semibold text-cyan-400 mb-4">Multiple Choice Questions</h4>
-                      <div className="space-y-4">
-                        {questions[section.id].mcqs.map((mcq, index) => (
-                          <MCQQuestion
-                            key={index}
-                            question={mcq.question}
-                            options={mcq.options}
-                            correctAnswer={mcq.correctAnswer}
-                            explanation={mcq.explanation}
-                            onComplete={() => handlePracticeComplete(section.id, 'mcq', index)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Coding Questions */}
-                  {questions[section.id].coding && questions[section.id].coding.length > 0 && (
-                    <div>
-                      <h4 className="text-xl font-semibold text-purple-400 mb-4">Mini Coding Challenges</h4>
-                      <div className="space-y-4">
-                        {questions[section.id].coding.map((code, index) => (
-                          <MiniCodingQuestion
-                            key={index}
-                            question={code.question}
-                            hint={code.hint}
-                            solution={code.solution}
-                            language={code.language}
-                            expectedOutput={code.expectedOutput}
-                            testCases={code.testCases}
-                            onComplete={() => handlePracticeComplete(section.id, 'coding', index)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -308,14 +308,21 @@ const LanguagePage = () => {
       </div>
       
       {/* Footer Buttons - At the end of content */}
-      <div className="w-full bg-gray-800 border-t border-gray-700 p-4 flex justify-center gap-4 mt-8">
+        <div className="w-full bg-gray-800 border-t border-gray-700 p-4 flex justify-center gap-4 mt-8">
         <Button 
           variant="outline" 
-          onClick={() => navigate('/')}
+          onClick={handleClose}
           className="flex items-center gap-2"
         >
           <X className="h-4 w-4" />
           Close
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/problems')}
+          className="flex items-center gap-2"
+        >
+          Problems
         </Button>
         <Button 
           variant="default" 

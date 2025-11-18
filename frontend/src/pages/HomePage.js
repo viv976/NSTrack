@@ -1,13 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Users, ArrowRight, Sun, Moon, CheckCircle2 } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { Users, ArrowRight, Sun, Moon, CheckCircle2, Bell, ChevronDown } from 'lucide-react';
+// theme toggle removed for landing page to enforce all-black design
 import FeaturesSection from '../components/FeaturesSection';
+import { useTheme } from '../context/ThemeContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('profilePhoto');
+      setProfilePhoto(saved);
+    } catch (e) {
+      setProfilePhoto(null);
+    }
+    try {
+      const u = JSON.parse(localStorage.getItem('user'));
+      setUser(u);
+    } catch (e) {
+      setUser(null);
+    }
+    setIsAuthenticated(!!localStorage.getItem('token'));
+  }, []);
 
   const benefits = [
     'Personalized learning paths tailored to YOUR goals',
@@ -19,7 +40,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-white transition-colors duration-200">
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         {/* Decorative background elements */}
@@ -29,55 +50,66 @@ const HomePage = () => {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 py-12">
-          {/* Navigation */}
           <nav className="flex items-center justify-between mb-20">
-            <h1 className={`text-3xl font-bold text-transparent bg-clip-text ${theme === 'dark' ? 'bg-gradient-to-r from-cyan-400 to-blue-500' : 'bg-gradient-to-r from-cyan-500 to-blue-600'}`} data-testid="home-logo">
+            <h1 className={`text-3xl font-bold text-cyan-400`} data-testid="home-logo">
               NSTrack
             </h1>
             <div className="flex items-center gap-4">
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                aria-label="Toggle theme"
-              >
-                {theme === 'dark' ? (
-                  <Sun className="w-5 h-5 text-yellow-400" />
-                ) : (
-                  <Moon className="w-5 h-5 text-gray-700" />
-                )}
+              {/* theme toggle intentionally removed from landing */}
+
+              {/* people icon with dot */}
+              <div className="relative">
+                <button className="p-2 rounded-md hover:bg-white/5">
+                  <Users className={`w-5 h-5 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} />
+                </button>
+                <span className={`absolute -top-1 -right-0.5 w-2.5 h-2.5 bg-blue-400 rounded-full ring-2 ${theme === 'dark' ? 'ring-black' : 'ring-white'}`} />
+              </div>
+
+              {/* bell */}
+              <button className="p-2 rounded-md hover:bg-white/5">
+                <Bell className={`w-5 h-5 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} />
               </button>
-              <Button
-                variant="ghost"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/login', { replace: false });
-                }}
-                className="text-gray-700 hover:text-cyan-600 dark:text-slate-300 dark:hover:text-cyan-400"
-                data-testid="home-login-btn"
-              >
-                Login
-              </Button>
-              <Button
-                variant="outline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/signup', { replace: false });
-                }}
-                className="border-cyan-500 text-cyan-600 hover:bg-cyan-50 dark:border-cyan-400 dark:text-cyan-300 dark:hover:bg-cyan-500/10"
-                data-testid="home-nav-signup-btn"
-              >
-                Sign Up
-              </Button>
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/signup', { replace: false });
-                }}
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold shadow-md hover:shadow-lg transition-all"
-                data-testid="home-signup-btn"
-              >
-                Get Started
-              </Button>
+
+              {/* Dropdown menu: shows Login/Sign Up when unauthenticated; Profile/Logout when authenticated */}
+              <div className="relative">
+                <button
+                  onClick={(e) => { e.preventDefault(); setMenuOpen((s) => !s); }}
+                  className="flex items-center gap-2 px-2 py-1 rounded-full hover:shadow-sm border border-transparent"
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                >
+                  {isAuthenticated ? (
+                    profilePhoto ? (
+                      <img src={profilePhoto} alt="avatar" className="w-8 h-8 rounded-full object-cover border border-gray-200" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
+                        <img src="/static/avatar-placeholder.png" alt="avatar" className="w-6 h-6" />
+                      </div>
+                    )
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-cyan-400">Account</span>
+                    </div>
+                  )}
+                  <ChevronDown className={`w-4 h-4 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} />
+                </button>
+
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg z-50">
+                    {isAuthenticated ? (
+                      <div className="flex flex-col py-1">
+                        <button onClick={(e) => { e.preventDefault(); setMenuOpen(false); navigate('/profile'); }} className="text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">Profile</button>
+                        <button onClick={(e) => { e.preventDefault(); localStorage.removeItem('token'); localStorage.removeItem('user'); setIsAuthenticated(false); setMenuOpen(false); navigate('/'); }} className="text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">Logout</button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col py-1">
+                        <button onClick={(e) => { e.preventDefault(); setMenuOpen(false); navigate('/login'); }} className="text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">Login</button>
+                        <button onClick={(e) => { e.preventDefault(); setMenuOpen(false); navigate('/signup'); }} className="text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">Sign Up</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </nav>
 
@@ -130,63 +162,17 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* Hero Section */}
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-100 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 mb-6">
-              <Users className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
-              <span className="text-cyan-700 dark:text-cyan-400 text-sm font-medium">Built for NST Students</span>
-            </div>
-            
-            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-700 dark:from-cyan-400 dark:to-blue-500">
-                Your AI-Powered
-              </span>
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 dark:from-cyan-400 dark:to-blue-500">
-                Learning Mentor
-              </span>
-            </h2>
-            
-            <p className="text-xl text-gray-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto">
-              Stop struggling with scattered resources. NSTrack creates personalized learning paths, 
-              generates practice problems, and guides you from basics to mastery - all in one place.
-            </p>
-            
-            <div className="flex items-center justify-center gap-4">
-              <Button 
-                onClick={() => navigate('/signup')} 
-                className="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-full shadow-lg transform transition-transform hover:scale-105"
-              >
-                Get Started Free
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium py-3 px-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                onClick={() => {
-                  const element = document.getElementById('features');
-                  element?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                Learn More
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      
       {/* Features Section */}
       <FeaturesSection />
 
-      {/* CTA Section */}
-      <div className="max-w-7xl mx-auto px-6 py-20">
-        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl p-12 text-center border-2 border-gray-100 dark:border-gray-700 shadow-xl">
-          <h3 className="text-5xl font-extrabold text-gray-900 dark:text-white mb-6">
+      {/* CTA Section (dark) */}
+  <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="bg-slate-900/60 backdrop-blur-sm rounded-2xl p-12 text-center border border-slate-800 shadow-xl">
+          <h3 className="text-5xl font-extrabold text-white mb-6">
             Ready to Transform Your Learning Journey?
           </h3>
-          <p className="text-xl text-gray-700 dark:text-gray-200 mb-10 max-w-2xl mx-auto font-medium">
+          <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto font-medium">
             Join NSTrack today and get your personalized AI-powered learning roadmap in minutes
           </p>
           <Button

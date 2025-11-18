@@ -92,7 +92,7 @@ const Dashboard = () => {
   const totalProgress = Math.min(((problemsSolved * 10 + topicsCompleted * 15) / 100) * 100, 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-100 transition-colors duration-200">
+    <div className="min-h-screen bg-black text-white transition-colors duration-200">
       {/* Header */}
       <nav className="bg-black/90 backdrop-blur-sm border-b border-gray-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -152,13 +152,13 @@ const Dashboard = () => {
       <main className="max-w-7xl mx-auto px-6 py-8">
         <section className="mb-12">
           <div className="bg-black/90 rounded-2xl p-8 shadow-lg border border-gray-800 hover:shadow-xl transition-all hover:border-cyan-500/30">
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+            <h2 className="text-3xl font-bold text-white mb-2">
               {localStorage.getItem('firstLogin') === 'false' ? 
                 `Welcome to NSTrack, ${user?.name?.split(' ')[0]}! 🎉` : 
                 `Welcome back, ${user?.name?.split(' ')[0]}!`}
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Your Points: <span className="text-cyan-500 dark:text-cyan-400 font-bold text-xl" data-testid="user-points">{user?.points || 0}</span>
+            <p className="text-lg text-slate-300">
+              Your Points: <span className="text-cyan-500 font-bold text-xl" data-testid="user-points">{user?.points || 0}</span>
             </p>
           </div>
         </section>
@@ -183,7 +183,7 @@ const Dashboard = () => {
         <div className="md:hidden mb-12 bg-black/80 rounded-2xl p-6 border border-gray-800">
           <h3 className="text-xl font-bold text-white mb-3">Languages</h3>
           <Select value={selectedLanguage} onValueChange={handleLanguageSelect}>
-            <SelectTrigger className="bg-white/10 border-gray-700 text-gray-100" data-testid="language-selector-mobile">
+            <SelectTrigger className="bg-black/80 border-gray-800 text-white" data-testid="language-selector-mobile">
               <SelectValue placeholder="Select a language" />
             </SelectTrigger>
             <SelectContent className="bg-gray-900 border-gray-800 text-gray-100">
@@ -203,16 +203,16 @@ const Dashboard = () => {
               <div
                 key={track.id}
                 onClick={() => handleTrackSelect(track.name)}
-                className="group bg-white dark:bg-gray-800/50 rounded-xl p-6 cursor-pointer border border-gray-200 dark:border-gray-700/50 hover:border-cyan-200 dark:hover:border-cyan-500/30 hover:shadow-md transition-all duration-200"
+                className="group bg-black/80 rounded-xl p-6 cursor-pointer border border-gray-800 hover:border-cyan-500/30 hover:shadow-md transition-all duration-200"
                 data-testid={`track-card-${track.id}`}
               >
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-gradient-to-br ${track.color} text-white`}>
                   <track.icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-cyan-600 transition-colors">
                   {track.name}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">{track.description}</p>
+                <p className="text-slate-300 text-sm">{track.description}</p>
               </div>
             ))}
           </div>

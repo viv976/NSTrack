@@ -29,29 +29,25 @@ const tracks = [
     icon: <Code2 className="w-6 h-6" />,
     title: 'Web Development',
     description: 'Build modern websites and web applications',
-    bg: 'bg-blue-100 dark:bg-blue-900/30',
-    border: 'border-blue-200 dark:border-blue-800'
+  accent: 'bg-blue-600'
   },
   {
     icon: <Smartphone className="w-6 h-6" />,
     title: 'App Development',
     description: 'Create mobile apps for iOS and Android',
-    bg: 'bg-green-100 dark:bg-green-900/30',
-    border: 'border-green-200 dark:border-green-800'
+  accent: 'bg-emerald-600'
   },
   {
     icon: <Cpu className="w-6 h-6" />,
     title: 'AI / Machine Learning',
     description: 'Master AI and ML algorithms',
-    bg: 'bg-purple-100 dark:bg-purple-900/30',
-    border: 'border-purple-200 dark:border-purple-800'
+  accent: 'bg-violet-600'
   },
   {
     icon: <BarChart3 className="w-6 h-6" />,
     title: 'DSA & Competitive Programming',
     description: 'Excel in problem-solving',
-    bg: 'bg-amber-100 dark:bg-amber-900/30',
-    border: 'border-amber-200 dark:border-amber-800'
+  accent: 'bg-amber-600'
   }
 ];
 
@@ -66,32 +62,32 @@ const benefits = [
 
 export default function FeaturesSection() {
   return (
-    <div className="py-16 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="py-16 bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl">
+          <h2 className="text-4xl font-bold text-white sm:text-5xl">
             Everything You Need to Succeed
           </h2>
-          <p className="mt-6 text-xl font-medium text-gray-800 dark:text-gray-200 max-w-3xl mx-auto leading-relaxed">
+          <p className="mt-6 text-xl font-medium text-gray-300 max-w-3xl mx-auto leading-relaxed">
             AI-powered features designed to accelerate your learning
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+      className="bg-gray-900 p-8 rounded-xl shadow-md border border-gray-800 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
             >
               <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 mb-6 shadow-inner">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+      <h3 className="text-xl font-bold text-white mb-3">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 dark:text-gray-300">
+      <p className="text-gray-300">
                 {feature.description}
               </p>
             </div>
@@ -100,26 +96,26 @@ export default function FeaturesSection() {
 
         {/* Learning Tracks */}
         <div className="mb-20">
-          <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-8">
+          <h2 className="text-2xl font-bold text-center text-white mb-8">
             Choose Your Path
           </h2>
-          <p className="text-center text-gray-600 dark:text-gray-300 mb-10 max-w-2xl mx-auto">
+          <p className="text-center text-gray-300 mb-10 max-w-2xl mx-auto">
             Select from 4 specialized learning tracks
           </p>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {tracks.map((track, index) => (
-              <div 
+              <div
                 key={index}
-                className={`p-6 rounded-xl border ${track.border} ${track.bg} hover:shadow-md transition-shadow`}
+                className={`p-6 rounded-xl border border-gray-700 bg-gray-800 hover:shadow-md transition-shadow`}
               >
-                <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white dark:bg-gray-700 text-gray-800 dark:text-white mb-4">
+                <div className={`w-12 h-12 flex items-center justify-center rounded-full ${track.accent} text-white mb-4`}>
                   {track.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   {track.title}
                 </h3>
-                <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-base">
+                <p className="text-gray-300 leading-relaxed text-base">
                   {track.description}
                 </p>
               </div>
@@ -128,42 +124,31 @@ export default function FeaturesSection() {
         </div>
 
         {/* Why Choose Section */}
-        <div className="bg-white dark:bg-gray-900 rounded-3xl p-10 md:p-14 mb-16 border-2 border-blue-200 dark:border-blue-800 shadow-2xl">
+        <div className="bg-gray-900 rounded-3xl p-10 md:p-14 mb-16 border-2 border-blue-800 shadow-2xl">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-5xl font-black text-gray-900 dark:text-white mb-8">
+            <h2 className="text-5xl font-black text-white mb-8">
               Why Choose NSTrack?
             </h2>
-            <p className="text-xl font-bold text-white mb-12 max-w-2xl mx-auto leading-relaxed px-6 py-4 bg-blue-600 dark:bg-blue-700 rounded-xl shadow-inner">
+            <p className="text-xl font-bold text-white mb-12 max-w-2xl mx-auto leading-relaxed px-6 py-4 bg-blue-600 rounded-xl shadow-inner">
               Built specifically for college students who want clear, structured learning
             </p>
             
             <ul className="grid md:grid-cols-2 gap-5 text-left mb-10">
               {benefits.map((benefit, index) => (
-                <li key={index} className="flex items-start p-6 rounded-xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 shadow-md hover:shadow-lg transition-all duration-200">
+                <li key={index} className="flex items-start p-6 rounded-xl bg-gray-800 border-2 border-gray-700 hover:border-blue-400 shadow-md hover:shadow-lg transition-all duration-200">
                   <div className="h-10 w-10 rounded-xl bg-blue-600 dark:bg-blue-700 flex items-center justify-center mr-4 flex-shrink-0 shadow-inner">
                     <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-gray-900 dark:text-white text-lg font-bold">{benefit}</span>
+                  <span className="text-white text-lg font-bold">{benefit}</span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Ready to Transform Your Learning Journey?
-          </h2>
-            <p className="text-xl text-gray-700 dark:text-gray-200 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Join NSTrack today and get your personalized AI-powered learning roadmap in minutes
-          </p>
-          <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-10 rounded-full shadow-xl transform transition-all duration-300 hover:scale-105 text-lg">
-            Get Started Free
-          </button>
-        </div>
+  {/* CTA removed here to avoid duplicate with HomePage CTA */}
       </div>
     </div>
   );

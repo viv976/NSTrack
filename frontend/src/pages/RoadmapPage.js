@@ -129,6 +129,7 @@ const TRACK_CONFIG = {
 const RoadmapPage = () => {
   // Define generateAIPoweredRoadmap as a static method to ensure it's accessible
   const navigate = useNavigate();
+  const trackOptions = Object.keys(TRACK_CONFIG).map(key => ({ value: key, label: TRACK_CONFIG[key].label }));
   const [step, setStep] = useState('questions');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -137,131 +138,11 @@ const RoadmapPage = () => {
     current_level: 'beginner'
   });
   const [roadmap, setRoadmap] = useState(null);
-  const [problemFilters, setProblemFilters] = useState({
-    category: 'all',
-    platform: 'all',
-    technology: 'all',
-    searchQuery: ''
-  });
+  const [generationError, setGenerationError] = useState(null);
+  // problemFilters removed: practice problems moved to separate Problems page
   const [track, setTrack] = useState(() => localStorage.getItem('selectedTrack') || 'web-dev');
-
-  useEffect(() => {
-    setFormData(prev => ({
-      ...prev,
-      time_availability: '5-10 hours',
-      current_level: 'beginner'
-    }));
-  }, []);
-
-  useEffect(() => {
-    const savedTrack = localStorage.getItem('selectedTrack');
-    if (savedTrack) {
-      setTrack(savedTrack);
-    }
-  }, []);
-
-  const trackOptions = Object.entries(TRACK_CONFIG).map(([value, config]) => ({
-    value,
-    label: config.label,
-    summary: config.summary
-  }));
-
-  // Enhanced technology detection with fuzzy matching and context awareness
-  const detectTechnologies = (text) => {
-    const techMap = {
-      // Frontend frameworks
-      'react': { 
-        aliases: ['react', 'reactjs', 'react.js', 'react-js', 'reactjs.org'],
-        category: 'frontend',
-        related: ['jsx', 'next.js', 'gatsby', 'remix', 'hooks', 'context', 'redux']
-      },
-      'vue': {
-        aliases: ['vue', 'vuejs', 'vue.js', 'vuejs.org'],
-        category: 'frontend',
-        related: ['vuex', 'pinia', 'nuxt.js', 'composition api']
-      },
-      'angular': {
-        aliases: ['angular', 'angularjs', 'angular.js'],
-        category: 'frontend',
-        related: ['rxjs', 'ngrx', 'ionic', 'angular material']
-      },
-      'svelte': {
-        aliases: ['svelte', 'sveltejs', 'svelte.js'],
-        category: 'frontend',
-        related: ['sveltekit', 'svelte-native']
-      },
-      // Backend technologies
-      'node': {
-        aliases: ['node', 'nodejs', 'node.js'],
-        category: 'backend',
-        related: ['express', 'koa', 'nest', 'fastify']
-      },
-      'express': {
-        aliases: ['express', 'expressjs', 'express.js'],
-        category: 'backend',
-        related: ['middleware', 'routing', 'rest api']
-      },
-      // Add more technologies as needed...
-    };
-
-    const detected = [];
-    const words = text.toLowerCase().split(/\s+/);
-    
-    for (const [tech, { aliases, category, related }] of Object.entries(techMap)) {
-      // Check for direct matches
-      const isMatch = aliases.some(alias => 
-        words.some(word => 
-          word.includes(alias) || 
-          alias.includes(word)
-        )
-      );
-      
-      // Check for related terms
-      const relatedMatches = related.filter(relatedTerm => 
-        words.some(word => word.includes(relatedTerm))
-      );
-
-      if (isMatch || relatedMatches.length > 0) {
-        detected.push({
-          name: tech,
-          category,
-          confidence: isMatch ? 'high' : 'medium',
-          related: relatedMatches
-        });
-      }
-    }
-
-    return detected;
-  };
-
-  const getPracticeProblems = (
-    focusArea,
-    level,
-    filters = {
-      category: 'all',
-      platform: 'all',
-      technology: 'all',
-      searchQuery: ''
-    },
-    trackKey = 'web-dev'
-  ) => {
+  const getPracticeProblems = (focusArea, level = 'beginner', filters = { category: 'all', platform: 'all', technology: 'all', searchQuery: '' }, trackKey = 'web-dev') => {
     const allProblems = [
-      {
-        id: 1,
-        title: 'Build a Todo App',
-        description: 'Create a responsive todo application with React',
-        difficulty: 'Medium',
-        category: 'projects',
-        platform: 'Frontend Mentor',
-        technology: 'React',
-        link: 'https://reactjs.org/tutorial/tutorial.html',
-        video: 'https://youtube.com/embed/w7ejDZ8SWv8',
-        resources: [
-          'React Documentation: https://reactjs.org/docs/getting-started.html',
-          'React Hooks Guide: https://reactjs.org/docs/hooks-intro.html'
-        ],
-        tracks: ['web-dev']
-      },
       {
         id: 2,
         title: 'Responsive Layout',
@@ -440,7 +321,7 @@ const RoadmapPage = () => {
       }
     ];
 
-    return allProblems.filter((problem) => {
+  return allProblems.filter((problem) => {
       const focusMatch = true;
       const levelMatch =
         (level === 'beginner' && problem.difficulty === 'Easy') ||
@@ -458,6 +339,36 @@ const RoadmapPage = () => {
 
       return focusMatch && levelMatch && categoryMatch && platformMatch && techMatch && searchMatch && trackMatch;
     });
+  };
+
+  // Simple technology detector used by the roadmap generator.
+  const detectTechnologies = (text = '') => {
+    const t = (text || '').toLowerCase();
+    const known = [
+      { name: 'react', category: 'frontend', aliases: ['react', 'reactjs', 'react.js'] },
+      { name: 'vue', category: 'frontend', aliases: ['vue', 'vuejs', 'vue.js'] },
+      { name: 'angular', category: 'frontend', aliases: ['angular'] },
+      { name: 'svelte', category: 'frontend', aliases: ['svelte'] },
+      { name: 'node.js', category: 'backend', aliases: ['node', 'nodejs', 'node.js'] },
+      { name: 'express', category: 'backend', aliases: ['express'] },
+      { name: 'python', category: 'backend', aliases: ['python'] },
+      { name: 'django', category: 'backend', aliases: ['django'] },
+      { name: 'flask', category: 'backend', aliases: ['flask'] },
+      { name: 'tensorflow', category: 'ml', aliases: ['tensorflow'] },
+      { name: 'pytorch', category: 'ml', aliases: ['pytorch'] },
+      { name: 'javascript', category: 'frontend', aliases: ['javascript', 'js', 'ecmascript'] },
+      { name: 'typescript', category: 'frontend', aliases: ['typescript', 'ts'] },
+      { name: 'tailwind', category: 'frontend', aliases: ['tailwind', 'tailwindcss'] }
+    ];
+
+    const results = [];
+    known.forEach(k => {
+      if (k.aliases.some(a => t.includes(a))) {
+        results.push({ name: k.name, category: k.category, confidence: 0.9, related: [] });
+      }
+    });
+
+    return results;
   };
 
   // Static method to generate roadmap
@@ -967,7 +878,7 @@ const RoadmapPage = () => {
     
     setLoading(true);
     
-    try {
+  try {
       // Generate the roadmap directly using the existing function
       const generatedRoadmap = RoadmapPage.generateAIPoweredRoadmap(
         formData.goals,
@@ -987,7 +898,9 @@ const RoadmapPage = () => {
       toast.success('Roadmap generated successfully!');
     } catch (error) {
       console.error('Error generating roadmap:', error);
-      toast.error('Failed to generate roadmap. Please try again.');
+      setGenerationError({ message: error?.message || 'Unknown error', stack: error?.stack || '' });
+      const msg = error?.message ? `Failed to generate roadmap: ${error.message}` : 'Failed to generate roadmap. Please try again.';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -1175,6 +1088,13 @@ const RoadmapPage = () => {
                 </Button>
               </div>
             </form>
+            {generationError && (
+              <div className="mt-4 p-4 bg-red-900 text-white rounded">
+                <h4 className="font-bold">Roadmap generation error</h4>
+                <p className="text-sm">{generationError.message}</p>
+                <pre className="text-xs mt-2 max-h-40 overflow-auto text-red-200">{generationError.stack}</pre>
+              </div>
+            )}
           </div>
         )}
 
@@ -1242,181 +1162,7 @@ const RoadmapPage = () => {
                 {roadmap.weeks.map(renderWeek)}
               </div>
 
-              {/* Enhanced Practice Problems Section */}
-              <div className="mt-12 bg-white/5 border border-gray-200/10 rounded-xl p-6">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                  <h3 className="text-2xl font-bold text-cyan-400 flex items-center gap-2 mb-4 md:mb-0">
-                    <Code className="w-6 h-6" />
-                    Practice Problems
-                  </h3>
-                  
-                  {/* Search Bar */}
-                  <div className="w-full md:w-64">
-                    <input
-                      type="text"
-                      placeholder="Search problems..."
-                      className="w-full bg-white/5 border border-gray-200/10 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                      value={problemFilters.searchQuery}
-                      onChange={(e) => setProblemFilters({...problemFilters, searchQuery: e.target.value})}
-                    />
-                  </div>
-                </div>
-
-                {/* Filters */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                  {/* Category Filter */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
-                    <select 
-                      className="w-full bg-white/5 border border-gray-200/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                      value={problemFilters.category}
-                      onChange={(e) => setProblemFilters({...problemFilters, category: e.target.value})}
-                    >
-                      <option value="all">All Categories</option>
-                      <option value="algorithms">Algorithms</option>
-                      <option value="system design">System Design</option>
-                      <option value="debugging">Debugging</option>
-                      <option value="projects">Projects</option>
-                      <option value="layout">Layout & Design</option>
-                      <option value="backend">Backend</option>
-                    </select>
-                  </div>
-                  
-                  {/* Platform Filter */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Platform</label>
-                    <select 
-                      className="w-full bg-white/5 border border-gray-200/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                      value={problemFilters.platform}
-                      onChange={(e) => setProblemFilters({...problemFilters, platform: e.target.value})}
-                    >
-                      <option value="all">All Platforms</option>
-                      <option value="LeetCode">LeetCode</option>
-                      <option value="HackerRank">HackerRank</option>
-                      <option value="CodeWars">CodeWars</option>
-                      <option value="Frontend Mentor">Frontend Mentor</option>
-                      <option value="FreeCodeCamp">FreeCodeCamp</option>
-                      <option value="Node.js Docs">Node.js Docs</option>
-                      <option value="Grokking">Grokking</option>
-                    </select>
-                  </div>
-                  
-                  {/* Technology Filter */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Technology</label>
-                    <select 
-                      className="w-full bg-white/5 border border-gray-200/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                      value={problemFilters.technology}
-                      onChange={(e) => setProblemFilters({...problemFilters, technology: e.target.value})}
-                    >
-                      <option value="all">All Technologies</option>
-                      <option value="React">React</option>
-                      <option value="Node.js">Node.js</option>
-                      <option value="JavaScript">JavaScript</option>
-                      <option value="CSS">CSS</option>
-                      <option value="System Design">System Design</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Problems Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {getPracticeProblems(roadmap.focusArea, formData.current_level, problemFilters, roadmap.trackKey).map((problem) => (
-                    <div key={problem.id} className="bg-white/5 rounded-xl border border-gray-200/10 hover:border-cyan-500/50 transition-all overflow-hidden">
-                      <div className="p-5">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h4 className="font-semibold text-white text-lg">{problem.title}</h4>
-                            <span className="inline-block text-xs px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-400 mt-1">
-                              {problem.platform}
-                            </span>
-                          </div>
-                          <span className={`text-xs px-2 py-1 rounded-full ${
-                            problem.difficulty === 'Easy' ? 'bg-green-500/10 text-green-400' :
-                            problem.difficulty === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' :
-                            'bg-red-500/10 text-red-400'
-                          }`}>
-                            {problem.difficulty}
-                          </span>
-                        </div>
-                        
-                        <p className="text-gray-300 text-sm mb-4">{problem.description}</p>
-                        
-                        {/* Video Preview */}
-                        {problem.video && (
-                          <div className="mb-4 rounded-lg overflow-hidden">
-                            <iframe 
-                              width="100%" 
-                              height="200" 
-                              src={problem.video}
-                              title={problem.title}
-                              frameBorder="0" 
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                              allowFullScreen
-                              className="rounded-lg"
-                            ></iframe>
-                          </div>
-                        )}
-                        
-                        {/* Resources */}
-                        <div className="mb-4">
-                          <p className="text-xs text-gray-400 mb-2">Resources:</p>
-                          <ul className="space-y-1">
-                            {problem.resources.map((resource, idx) => (
-                              <li key={idx} className="text-xs text-cyan-400 hover:underline">
-                                <a href={resource.split(': ')[1]} target="_blank" rel="noopener noreferrer">
-                                  {resource.split(': ')[0]}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          <span className="text-xs px-2 py-1 rounded-full bg-gray-700/50 text-gray-300">
-                            {problem.technology}
-                          </span>
-                          <span className="text-xs px-2 py-1 rounded-full bg-gray-700/50 text-gray-300">
-                            {problem.category}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-900/30 px-5 py-3 border-t border-gray-200/10 flex justify-end">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
-                          onClick={() => window.open(problem.link, '_blank')}
-                        >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Solve on {problem.platform}
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* No Results Message */}
-                {getPracticeProblems(roadmap.focusArea, formData.current_level, problemFilters, roadmap.trackKey).length === 0 && (
-                  <div className="text-center py-10">
-                    <p className="text-gray-400">No problems match your current filters. Try adjusting your search criteria.</p>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="mt-4 text-cyan-400 hover:bg-cyan-500/10"
-                      onClick={() => setProblemFilters({
-                        category: 'all',
-                        platform: 'all',
-                        technology: 'all',
-                        searchQuery: ''
-                      })}
-                    >
-                      Clear all filters
-                    </Button>
-                  </div>
-                )}
-              </div>
+              {/* Practice problems removed from roadmap view; use Problems page in navbar instead. */}
 
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
                 <Button

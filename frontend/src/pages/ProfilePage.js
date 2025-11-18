@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API, getAuthHeaders } from '../App';
 import { Button } from '../components/ui/button';
-import { User, Trophy, Target, Calendar as CalendarIcon, Flame, Award } from 'lucide-react';
+import { User, Trophy, Target, Calendar as CalendarIcon, Flame, Award, Edit3, LogOut } from 'lucide-react';
 import { Progress } from '../components/ui/progress';
 import { toast } from 'sonner';
 import { useProgress } from '../context/ProgressContext';
@@ -11,10 +12,45 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const { progress, getProblemsSolved, getTopicProgress } = useProgress();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  // profile photo preview state
+  const [photoPreview, setPhotoPreview] = useState(() => {
+    try {
+      const saved = localStorage.getItem('profilePhoto');
+      return saved || null;
+    } catch (e) {
+      return null;
+    }
+  });
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const triggerFilePicker = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handlePhotoFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      setPhotoPreview(result);
+      try {
+        localStorage.setItem('profilePhoto', result);
+        toast.success('Profile photo saved locally');
+      } catch (err) {
+        toast.error('Failed to save photo');
+      }
+    };
+    reader.readAsDataURL(file);
+    setShowPhotoMenu(false);
+  };
 
   const fetchProfile = async () => {
     try {
@@ -70,13 +106,63 @@ const ProfilePage = () => {
 
   const achievements = getAchievements();
 
+  const handleLogout = () => {
+    try {
+      localStorage.clear();
+    } catch (e) {
+      // ignore
+    }
+    toast.success('Logged out successfully');
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, rgb(3,7,18) 0%, rgb(6,15,35) 100%)' }}>
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12 text-center animate-fade-in">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center mx-auto mb-6">
-            <User className="w-12 h-12 text-white" />
+          <div className="w-24 h-24 relative mx-auto mb-6">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center overflow-hidden">
+              {photoPreview ? (
+                <img src={photoPreview} alt="avatar" className="w-24 h-24 object-cover" />
+              ) : (
+                <User className="w-12 h-12 text-white" />
+              )}
+            </div>
+            {/* pencil overlay */}
+            <button
+              aria-label="edit photo"
+              onClick={() => setShowPhotoMenu((s) => !s)}
+              className="absolute right-0 bottom-0 -mb-1 -mr-1 bg-slate-800/70 hover:bg-slate-700 rounded-full p-1 shadow-lg border border-slate-700"
+            >
+              <Edit3 className="w-4 h-4 text-white" />
+            </button>
+            {showPhotoMenu && (
+              <div className="absolute left-full top-0 ml-3 w-44 bg-white border border-slate-200 rounded shadow-lg z-30">
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoFileChange} />
+                <button
+                  type="button"
+                  className="w-full text-left px-3 py-2 hover:bg-slate-100 text-slate-900"
+                  onClick={() => {
+                    triggerFilePicker();
+                  }}
+                >
+                  Change Photo
+                </button>
+                <button
+                  type="button"
+                  className="w-full text-left px-3 py-2 hover:bg-slate-100 text-slate-900"
+                  onClick={() => {
+                    setPhotoPreview(null);
+                    localStorage.removeItem('profilePhoto');
+                    setShowPhotoMenu(false);
+                    toast.success('Profile photo removed');
+                  }}
+                >
+                  Remove Photo
+                </button>
+              </div>
+            )}
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2" data-testid="profile-name">{user?.name}</h1>
           <p className="text-slate-300 text-lg">{user?.email}</p>
@@ -188,7 +274,7 @@ const ProfilePage = () => {
           )}
         </div>
 
-        {/* Member Since */}
+  {/* Member Since */}
         <div className="glass-effect rounded-2xl p-8 mb-8">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center">
@@ -203,16 +289,16 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="mt-8 text-center">
-          <Button
-            onClick={() => window.close()}
-            data-testid="close-profile-btn"
-            variant="outline"
-            className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
+        {/* Bottom actions: logout moved here */}
+        <div className="mt-8 pt-6 border-t border-slate-700 flex justify-center">
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-md bg-red-600 hover:bg-red-700 text-white font-medium"
+            data-testid="profile-logout-btn"
           >
-            Close
-          </Button>
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
         </div>
       </div>
     </div>
