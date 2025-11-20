@@ -276,4 +276,63 @@ export const practiceQuestions = {
       ]
     }
   }
+  ,
+  html_css: {
+    'html-css-phase-1': {
+      mcqs: [
+        { id: 'html1-m1', question: 'Which tag represents the main content of an HTML document?', options: ['<main>', '<section>', '<article>', '<body>'], correctAnswer: 0, explanation: 'The <main> element represents the dominant content.' },
+        { id: 'html1-m2', question: 'Which attribute is required for images to be accessible?', options: ['title', 'role', 'alt', 'srcset'], correctAnswer: 2, explanation: 'alt provides alternative text for assistive tech.' },
+        { id: 'html1-m3', question: 'What does DOCTYPE declaration do?', options: ['Links stylesheet', 'Sets document mode', 'Defines meta charset', 'Includes script'], correctAnswer: 1, explanation: 'DOCTYPE tells the browser which HTML spec to use (standards mode).'},
+        { id: 'html1-m4', question: 'Which tag creates an unordered list?', options: ['<ol>', '<ul>', '<li>', '<list>'], correctAnswer: 1, explanation: '<ul> creates unordered lists, <ol> is ordered.' },
+        { id: 'html1-m5', question: 'Which input type is used for submitting a form?', options: ['text', 'button', 'submit', 'form'], correctAnswer: 2, explanation: 'type="submit" triggers form submission.' }
+      ],
+      coding: [
+        { id: 'html1-c1', title: 'Create a basic HTML page', question: 'Create a minimal valid HTML document including a header, main with one paragraph, and footer.', starter: '<!doctype html>\n<html>\n  <head>\n    <meta charset="utf-8">\n    <title>My Page</title>\n  </head>\n  <body>\n    <!-- your content -->\n  </body>\n</html>', tests: ['contains <header>', 'contains <main>', 'contains <footer>'] },
+        { id: 'html1-c2', title: 'Accessible image', question: 'Add an image tag with an appropriate alt attribute describing the image.', starter: '<img src="/images/sample.jpg" alt="">', tests: ['alt is not empty'] },
+        { id: 'html1-c3', title: 'Form basics', question: 'Create a form with a text input (name) and a submit button.', starter: '<form action="#">\n  <!-- inputs -->\n</form>', tests: ['contains <input', 'contains type="submit"'] }
+      ]
+    },
+    'html-css-phase-2': {
+      mcqs: [
+        { id: 'html2-m1', question: 'Which CSS property controls layout in a flex container?', options: ['display', 'flex-direction', 'position', 'float'], correctAnswer: 1, explanation: 'flex-direction sets main axis for flex items.' },
+        { id: 'html2-m2', question: 'Which display value creates a grid container?', options: ['display: flex', 'display: block', 'display: grid', 'display: inline-grid'], correctAnswer: 2, explanation: 'display: grid initializes a grid layout.' },
+        { id: 'html2-m3', question: 'Which unit is relative to the root font-size?', options: ['em', 'rem', 'px', '%'], correctAnswer: 1, explanation: 'rem is relative to the root (<html>) font-size.' },
+        { id: 'html2-m4', question: 'How do you make an element responsive to screen size?', options: ['@media rules', 'position: fixed', 'float:left', 'display:inline'], correctAnswer: 0, explanation: 'Media queries apply styles based on viewport constraints.' },
+        { id: 'html2-m5', question: 'Which CSS property controls spacing between items in a flex container?', options: ['gap', 'margin', 'padding', 'space-between'], correctAnswer: 0, explanation: 'gap sets spacing between items in flex and grid.' }
+      ],
+      coding: [
+        { id: 'html2-c1', title: 'Center with Flexbox', question: 'Create a container that centers its child both vertically and horizontally using Flexbox.', starter: '<div class="container">\n  <div class="child">Hello</div>\n</div>', tests: ['container has display:flex', 'justify-content:center or align-items:center present'] },
+        { id: 'html2-c2', title: 'Two-column Grid', question: 'Create a two-column responsive grid that stacks to one column on small screens.', starter: '<div class="grid">\n  <div>1</div>\n  <div>2</div>\n</div>', tests: ['display:grid', 'grid-template-columns at least 2 columns', '@media present for breakpoint'] },
+        { id: 'html2-c3', title: 'Responsive image', question: 'Use srcset or CSS to ensure an image adapts to different screen sizes.', starter: '<img src="/img.jpg" alt="">', tests: ['contains srcset or responsive styles'] }
+      ]
+    },
+    'html-css-phase-3': {
+      mcqs: [
+        { id: 'html3-m1', question: 'Which feature allows you to define reusable CSS values?', options: ['mixins', 'variables', 'components', 'functions'], correctAnswer: 1, explanation: 'CSS custom properties are variables.' },
+        { id: 'html3-m2', question: 'Which pseudo-class is used for keyboard focus?', options: [':hover', ':active', ':focus', ':visited'], correctAnswer: 2, explanation: ':focus indicates keyboard focus.' },
+        { id: 'html3-m3', question: 'Which property triggers GPU acceleration for smoother animations?', options: ['transform', 'top', 'left', 'width'], correctAnswer: 0, explanation: 'Using transform/opacity is more performant.' },
+        { id: 'html3-m4', question: 'What does ARIA stand for?', options: ['Accessible Rich Internet Applications', 'All Regions In Apps', 'Accessible React Interface App', 'None'], correctAnswer: 0, explanation: 'ARIA provides accessibility semantics.' },
+        { id: 'html3-m5', question: 'Which method helps avoid layout shift?', options: ['Specifying image dimensions', 'Using inline styles', 'Removing CSS', 'Using z-index'], correctAnswer: 0, explanation: 'Reserving space prevents Cumulative Layout Shift.' }
+      ],
+      coding: [
+        { id: 'html3-c1', title: 'Theme variables', question: 'Create CSS variables for primary and background colors and apply them to body and a .btn class.', starter: ':root { --primary: #06b6d4; }\nbody { background: var(--background); }', tests: ['--primary defined', 'var(--primary) used'] },
+        { id: 'html3-c2', title: 'Accessible focus', question: 'Add visible focus styles to links and buttons.', starter: 'a { }\nbutton { }', tests: [':focus selector present', 'outline or box-shadow used'] },
+        { id: 'html3-c3', title: 'Smooth transition', question: 'Add a hover transition to a .card element for transform and box-shadow.', starter: '.card { }', tests: ['transition property includes transform or box-shadow'] }
+      ]
+    },
+    'html-css-phase-4': {
+      mcqs: [
+        { id: 'html4-m1', question: 'Which tool is a CSS preprocessor?', options: ['PostCSS', 'Sass', 'Autoprefixer', 'Babel'], correctAnswer: 1, explanation: 'Sass is a CSS preprocessor.' },
+        { id: 'html4-m2', question: 'What is critical CSS?', options: ['CSS for above-the-fold content', 'All CSS loaded', 'Minified CSS', 'Unused CSS'], correctAnswer: 0, explanation: 'Critical CSS renders initial view quickly.' },
+        { id: 'html4-m3', question: 'Which helps responsive images?', options: ['srcset', 'lazyload', 'picture element', 'All of the above'], correctAnswer: 3, explanation: 'All assist responsive image delivery.' },
+        { id: 'html4-m4', question: 'Which practice reduces CSS bundle size?', options: ['Tree shaking', 'Eliminating unused CSS', 'Inlining all CSS', 'Using large libraries'], correctAnswer: 1, explanation: 'Remove unused rules to reduce size.' },
+        { id: 'html4-m5', question: 'Which attribute helps with image lazy loading?', options: ['loading', 'defer', 'async', 'lazy'], correctAnswer: 0, explanation: 'loading="lazy" defers offscreen images.' }
+      ],
+      coding: [
+        { id: 'html4-c1', title: 'Sass nesting', question: 'Write a small Sass snippet that nests a .nav and .nav-item with hover.', starter: '$nav-color: #333; .nav { }', tests: ['use of nesting or variables'] },
+        { id: 'html4-c2', title: 'Optimize images', question: 'Add markup or attributes to make images responsive and lazy-loaded.', starter: '<img src="/hero.jpg" alt="">', tests: ['loading="lazy" or srcset present'] },
+        { id: 'html4-c3', title: 'Build a small project', question: 'Create a small responsive card component using Grid or Flexbox.', starter: '<div class="card">\n</div>', tests: ['.card styles include display:flex or display:grid', 'responsive rules exist'] }
+      ]
+    }
+  }
 };

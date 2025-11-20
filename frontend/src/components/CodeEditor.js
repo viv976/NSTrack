@@ -28,14 +28,23 @@ const CodeEditor = ({ language, problem, onSubmit }) => {
   }, [problem]);
 
   const getLanguageMode = (lang) => {
+    const key = (lang || '').toLowerCase();
     const modes = {
       python: 'python',
       javascript: 'javascript',
       java: 'java',
-      cpp: 'cpp'
+      cpp: 'cpp',
+      html: 'html',
+      css: 'css',
+      html_css: 'html'
     };
-    return modes[lang] || 'python';
+    return modes[key] || 'plaintext';
   };
+
+  // Friendly label for UI (guard against undefined language)
+  const displayLanguage = (language && typeof language === 'string' && language.trim())
+    ? language.replace(/_/g, ' ').toUpperCase()
+    : 'PLAINTEXT';
 
   const handleRun = () => {
     setIsRunning(true);
@@ -296,7 +305,7 @@ const CodeEditor = ({ language, problem, onSubmit }) => {
                 <div className="ml-2 text-slate-200 font-semibold">{problem?.title || 'Challenge'}</div>
               </div>
               <div className="ml-3 flex items-center text-xs text-slate-400">
-                <span className="px-2 py-0.5 bg-slate-900/30 rounded">{language.toUpperCase()}</span>
+                <span className="px-2 py-0.5 bg-slate-900/30 rounded">{displayLanguage}</span>
               </div>
             </div>
 

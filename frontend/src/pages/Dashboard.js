@@ -110,6 +110,7 @@ const Dashboard = () => {
                 <SelectContent className="bg-gray-900 border-gray-800 text-slate-200">
                   <SelectItem value="python">Python</SelectItem>
                   <SelectItem value="java">Java</SelectItem>
+                  <SelectItem value="html_css">HTML & CSS</SelectItem>
                   <SelectItem value="cpp">C++</SelectItem>
                   <SelectItem value="javascript">JavaScript</SelectItem>
                 </SelectContent>
@@ -189,6 +190,7 @@ const Dashboard = () => {
             <SelectContent className="bg-gray-900 border-gray-800 text-gray-100">
               <SelectItem value="python">Python</SelectItem>
               <SelectItem value="java">Java</SelectItem>
+              <SelectItem value="html_css">HTML & CSS</SelectItem>
               <SelectItem value="cpp">C++</SelectItem>
               <SelectItem value="javascript">JavaScript</SelectItem>
             </SelectContent>

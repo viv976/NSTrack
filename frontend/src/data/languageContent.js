@@ -269,6 +269,57 @@ export const languageRoadmaps = {
       }
     ]
   }
+  ,
+  html_css: {
+    title: 'HTML & CSS Learning Path',
+    description: 'Learn semantic HTML, modern CSS layouts (Flexbox & Grid), responsive design, accessibility, and tooling.',
+    sections: [
+      {
+        id: 'html-css-phase-1',
+        phase: 'Phase 1: Foundations',
+        title: '1. HTML & CSS Basics',
+        duration: '2-3 days',
+        difficulty: 'Beginner',
+        topics: [
+          { name: 'HTML document structure', content: 'doctype, html, head, body, semantic tags (header, main, footer)', example: '<!doctype html>\n<html>\n  <head>...</head>\n  <body>...</body>\n</html>' },
+          { name: 'Common tags', content: 'p, a, img, ul, ol, li, form, input, button', example: '<img src="/path/to/img" alt="desc" />' }
+        ]
+      },
+      {
+        id: 'html-css-phase-2',
+        phase: 'Phase 2: Layouts',
+        title: '2. Layout & Positioning',
+        duration: '3-5 days',
+        difficulty: 'Intermediate',
+        topics: [
+          { name: 'Flexbox & Grid', content: 'One-dimensional layout with Flexbox; two-dimensional layout with Grid', example: 'display: flex; display: grid;' },
+          { name: 'Responsive design', content: 'Media queries, fluid units, breakpoints', example: '@media (max-width: 768px) { ... }' }
+        ]
+      },
+      {
+        id: 'html-css-phase-3',
+        phase: 'Phase 3: Components',
+        title: '3. Advanced CSS & Components',
+        duration: '4-6 days',
+        difficulty: 'Advanced',
+        topics: [
+          { name: 'CSS variables & theming', content: 'Custom properties, theming with data-attributes', example: ':root { --brand: #06b6d4 }' },
+          { name: 'Transitions & accessibility', content: 'Animations, focus states, ARIA basics', example: 'transition: transform .2s ease;' }
+        ]
+      },
+      {
+        id: 'html-css-phase-4',
+        phase: 'Phase 4: Tooling & Projects',
+        title: '4. Tooling & Projects',
+        duration: '5-10 days',
+        difficulty: 'Advanced',
+        topics: [
+          { name: 'Sass & PostCSS', content: 'Preprocessors and autoprefixing', example: '$primary: #06b6d4; .btn { color: $primary }' },
+          { name: 'Performance & optimization', content: 'Critical CSS, responsive images, minification', example: 'link rel=preload ...' }
+        ]
+      }
+    ]
+  }
 };
 
 export const practiceProblems = {

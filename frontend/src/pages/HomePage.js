@@ -82,12 +82,18 @@ const HomePage = () => {
                     profilePhoto ? (
                       <img src={profilePhoto} alt="avatar" className="w-8 h-8 rounded-full object-cover border border-gray-200" />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
-                        <img src="/static/avatar-placeholder.png" alt="avatar" className="w-6 h-6" />
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center overflow-hidden transform transition-all hover:scale-105">
+                        <Users className="w-4 h-4 text-white" />
                       </div>
                     )
                   ) : (
                     <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center overflow-hidden transform transition-all hover:scale-105">
+                          <Users className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-white/30 rounded-full animate-pulse" />
+                      </div>
                       <span className="text-sm font-medium text-cyan-400">Account</span>
                     </div>
                   )}

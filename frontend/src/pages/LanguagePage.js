@@ -253,8 +253,9 @@ const LanguagePage = () => {
               {isSectionCompleted(section.id) && (
                 <div className="mt-6 space-y-4">
                   <h4 className="text-lg font-semibold text-white">Practice: Full Set (MCQs + Coding)</h4>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {/* Render all MCQs for the section (expecting up to 5) */}
+
+                  {/* MCQs displayed in a responsive 2-column grid (2 by 2 feel) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {practiceQuestions[lang] && practiceQuestions[lang][section.id]?.mcqs?.map((q, idx) => (
                       <MCQQuestion
                         key={`mcq-${idx}`}
@@ -265,22 +266,31 @@ const LanguagePage = () => {
                         onComplete={() => handlePracticeComplete(section.id, 'mcq', idx)}
                       />
                     ))}
+                  </div>
 
-                    {/* Render up to 3 coding mini questions for the section */}
-                    <div className="space-y-4">
-                      {practiceQuestions[lang] && practiceQuestions[lang][section.id]?.coding?.slice(0,3)?.map((c, idx) => (
-                        <MiniCodingQuestion
-                          key={`code-${idx}`}
-                          question={c.question}
-                          hint={c.hint}
-                          solution={c.solution}
-                          language={c.language}
-                          expectedOutput={c.expectedOutput}
-                          testCases={c.testCases}
-                          onComplete={() => handlePracticeComplete(section.id, 'coding', idx)}
-                        />
-                      ))}
-                    </div>
+                  {/* Coding challenges rendered full-width so their CodeEditor can expand across the page */}
+                  <div className="mt-4 space-y-6">
+                    {practiceQuestions[lang] && practiceQuestions[lang][section.id]?.coding?.slice(0,3)?.map((c, idx) => {
+                      const questionText = c.question || c.title || c.prompt || '';
+                      const hintText = c.hint || c.hintText || '';
+                      const solutionText = c.solution || c.starter || c.answer || '';
+                      const langKey = c.language || (lang === 'html_css' ? 'html' : lang) || '';
+                      const expected = c.expectedOutput || c.expected_output || c.expected || '';
+                      const tests = c.testCases || c.test_cases || c.tests || [];
+                      return (
+                        <div key={`code-full-${idx}`} className="glass-effect rounded-2xl p-6">
+                          <MiniCodingQuestion
+                            question={questionText}
+                            hint={hintText}
+                            solution={solutionText}
+                            language={langKey}
+                            expectedOutput={expected}
+                            testCases={tests}
+                            onComplete={() => handlePracticeComplete(section.id, 'coding', idx)}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
