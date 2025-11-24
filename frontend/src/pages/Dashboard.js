@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Code, Smartphone, Brain, Trophy, User, LogOut, Sun, Moon, Flame } from 'lucide-react';
+import { Code, Smartphone, Brain, Trophy, User, LogOut, Sun, Moon, Flame, Users } from 'lucide-react';
 import { Progress } from '../components/ui/progress';
 import { toast } from 'sonner';
 import { useTheme } from '../context/ThemeContext';
@@ -116,21 +116,16 @@ const Dashboard = () => {
                 </SelectContent>
               </Select>
             </div>
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-gray-800 text-gray-300 hover:text-cyan-400 transition-all duration-300 hover:scale-110"
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
             <Link to="/problems">
               <Button variant="ghost" className="text-gray-300 hover:text-cyan-400 hover:bg-gray-800/50 transition-all duration-300" data-testid="problems-nav-btn">
                 <Trophy className="w-4 h-4 mr-2" />
                 Problems
+              </Button>
+            </Link>
+            <Link to="/friends">
+              <Button variant="ghost" className="text-gray-300 hover:text-cyan-400 hover:bg-gray-800/50 transition-all duration-300" data-testid="friends-nav-btn">
+                <Users className="w-4 h-4 mr-2" />
+                Friends
               </Button>
             </Link>
             <Link to="/profile">

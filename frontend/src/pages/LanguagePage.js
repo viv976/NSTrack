@@ -20,7 +20,7 @@ const LanguagePage = () => {
   const [showPractice, setShowPractice] = useState({});
   const [completedPractice, setCompletedPractice] = useState({});
   const { progress, markTopicComplete, getTopicProgress, resetLanguageProgress } = useProgress();
-  
+
   const roadmap = languageRoadmaps[lang];
   // practice questions removed from roadmap sections
   const completedTopics = progress.completedTopics[lang] || {};
@@ -35,27 +35,27 @@ const LanguagePage = () => {
   const isSectionCompleted = (sectionId) => {
     const section = roadmap.sections.find(s => s.id === sectionId);
     if (!section) return false;
-    
+
     return section.topics.every((_, index) => isTopicCompleted(sectionId, index));
   };
 
   const isTopicLocked = (sectionIndex, topicIndex) => {
     // First topic is always unlocked
     if (sectionIndex === 0 && topicIndex === 0) return false;
-    
+
     // Check if previous topic is completed
     if (topicIndex > 0) {
       const prevTopicId = `${roadmap.sections[sectionIndex].id}-${topicIndex - 1}`;
       return !completedTopics[prevTopicId];
     }
-    
+
     // Check if previous section's last topic is completed
     if (sectionIndex > 0) {
       const prevSection = roadmap.sections[sectionIndex - 1];
       const lastTopicId = `${prevSection.id}-${prevSection.topics.length - 1}`;
       return !completedTopics[lastTopicId];
     }
-    
+
     return false;
   };
 
@@ -160,22 +160,21 @@ const LanguagePage = () => {
                   const topicId = `${section.id}-${topicIndex}`;
                   const isCompleted = isTopicCompleted(section.id, topicIndex);
                   const isLocked = isTopicLocked(sectionIndex, topicIndex);
-                  
+
                   return (
                     <div
                       key={topicIndex}
-                      className={`border rounded-xl overflow-hidden transition-all ${
-                        isLocked
+                      className={`border rounded-xl overflow-hidden transition-all ${isLocked
                           ? 'border-slate-700 bg-slate-900/30 opacity-60'
                           : isCompleted
-                          ? 'border-green-500/30 bg-green-500/5'
-                          : 'border-cyan-500/30 bg-slate-800/30'
-                      }`}
+                            ? 'border-green-500/30 bg-green-500/5'
+                            : 'border-cyan-500/30 bg-slate-800/30'
+                        }`}
                       data-testid={`topic-${topicId}`}
                     >
                       <Accordion type="single" collapsible>
                         <AccordionItem value={topicId} className="border-none">
-                          <AccordionTrigger 
+                          <AccordionTrigger
                             className="px-6 py-4 hover:no-underline hover:bg-slate-700/20 transition-colors"
                             disabled={isLocked}
                           >
@@ -197,15 +196,15 @@ const LanguagePage = () => {
                               </div>
                             </div>
                           </AccordionTrigger>
-                          
+
                           {!isLocked && (
                             <AccordionContent className="px-6 py-6 bg-slate-900/30">
                               {/* Content */}
                               <div className="prose prose-invert max-w-none mb-6">
-                                <div className="text-slate-300 whitespace-pre-line leading-relaxed mb-6">
+                                <div className="text-slate-300 text-base leading-7 mb-6 space-y-3">
                                   {topic.content}
                                 </div>
-                                
+
                                 {/* Code Example */}
                                 {topic.example && (
                                   <div className="code-block mb-6">
@@ -233,7 +232,7 @@ const LanguagePage = () => {
                                   </Button>
                                 </div>
                               )}
-                              
+
                               {isCompleted && (
                                 <div className="flex items-center justify-center gap-2 text-green-400 py-4">
                                   <CheckCircle2 className="w-5 h-5" />
@@ -270,7 +269,7 @@ const LanguagePage = () => {
 
                   {/* Coding challenges rendered full-width so their CodeEditor can expand across the page */}
                   <div className="mt-4 space-y-6">
-                    {practiceQuestions[lang] && practiceQuestions[lang][section.id]?.coding?.slice(0,3)?.map((c, idx) => {
+                    {practiceQuestions[lang] && practiceQuestions[lang][section.id]?.coding?.slice(0, 3)?.map((c, idx) => {
                       const questionText = c.question || c.title || c.prompt || '';
                       const hintText = c.hint || c.hintText || '';
                       const solutionText = c.solution || c.starter || c.answer || '';
@@ -316,11 +315,11 @@ const LanguagePage = () => {
         )}
 
       </div>
-      
+
       {/* Footer Buttons - At the end of content */}
-        <div className="w-full bg-gray-800 border-t border-gray-700 p-4 flex justify-center gap-4 mt-8">
-        <Button 
-          variant="outline" 
+      <div className="w-full bg-gray-800 border-t border-gray-700 p-4 flex justify-center gap-4 mt-8">
+        <Button
+          variant="outline"
           onClick={handleClose}
           className="flex items-center gap-2"
         >
@@ -334,19 +333,19 @@ const LanguagePage = () => {
         >
           Problems
         </Button>
-        <Button 
-          variant="default" 
+        <Button
+          variant="default"
           onClick={() => {
             // Reset progress for the current language
             resetLanguageProgress(lang);
-            
+
             // Force a re-render by updating state
             setActiveSection(null);
             setShowPractice({});
-            
+
             // Show a success message
             toast.success('Progress has been reset. Starting fresh!');
-            
+
             // Scroll to top after a small delay to ensure state updates are processed
             setTimeout(() => {
               window.scrollTo(0, 0);
@@ -360,7 +359,7 @@ const LanguagePage = () => {
           Restart Learning
         </Button>
       </div>
-      
+
     </div>
   );
 };

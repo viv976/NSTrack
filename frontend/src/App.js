@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import Dashboard from './pages/Dashboard';
+import FriendsPage from './pages/FriendsPage';
 import LanguagePage from './pages/LanguagePage';
 import RoadmapPage from './pages/RoadmapPage';
 import ProblemsPage from './pages/ProblemsPage';
@@ -46,9 +47,8 @@ const AppContent = () => {
   return (
     <ProgressProvider>
       <div
-        className={`App min-h-screen transition-colors duration-200 ${
-          theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'
-        }`}
+        className={`App min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'
+          }`}
       >
         <BrowserRouter>
           <Routes>
@@ -62,6 +62,7 @@ const AppContent = () => {
               element={!isAuthenticated ? <SignupPage setAuth={setIsAuthenticated} /> : <Navigate to="/dashboard" />}
             />
             <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+            <Route path="/friends" element={isAuthenticated ? <FriendsPage /> : <Navigate to="/login" />} />
             <Route path="/language/:lang" element={isAuthenticated ? <LanguagePage /> : <Navigate to="/login" />} />
             <Route path="/roadmap" element={isAuthenticated ? <RoadmapPage /> : <Navigate to="/login" />} />
             <Route path="/problems" element={isAuthenticated ? <ProblemsPage /> : <Navigate to="/login" />} />

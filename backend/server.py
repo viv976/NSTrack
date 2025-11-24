@@ -41,6 +41,7 @@ class UserSignup(BaseModel):
     email: EmailStr
     password: str
     skill_level: str  # Beginner, Intermediate, Advanced
+    batch: Optional[str] = None  # Turing, Hopper, Neumann, Ramanujan
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -52,8 +53,11 @@ class User(BaseModel):
     name: str
     email: str
     skill_level: str
+    batch: Optional[str] = None
     points: int = 10
     selected_track: Optional[str] = None
+    following: List[str] = Field(default_factory=list)  # List of user IDs
+    followers: List[str] = Field(default_factory=list)  # List of user IDs
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class TokenResponse(BaseModel):
@@ -157,6 +161,7 @@ async def signup(user_data: UserSignup):
         name=user_data.name,
         email=user_data.email,
         skill_level=user_data.skill_level,
+        batch=user_data.batch,
         points=points
     )
     
@@ -430,6 +435,115 @@ async def complete_problem(data: ProblemComplete, current_user: Dict = Depends(g
     await db.problem_completions.insert_one(completion_record)
     
     return {"message": "Problem marked as complete"}
+
+# Friends endpoints
+@api_router.get("/users")
+async def get_users(batch: Optional[str] = None, current_user: Dict = Depends(get_current_user)):
+    """Get all users with optional batch filter"""
+    query = {}
+    if batch and batch != "All":
+        query["batch"] = batch
+    
+    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).to_list(1000)
+    
+    # Convert created_at to datetime if needed
+    for user in users:
+        if isinstance(user.get('created_at'), str):
+            user['created_at'] = datetime.fromisoformat(user['created_at'])
+    
+    return {"users": users}
+
+@api_router.get("/search/users")
+async def search_users(q: str, current_user: Dict = Depends(get_current_user)):
+    """Search users by name"""
+    users = await db.users.find(
+        {"name": {"$regex": q, "$options": "i"}},
+        {"_id": 0, "password_hash": 0}
+    ).to_list(100)
+    
+    # Convert created_at to datetime if needed
+    for user in users:
+        if isinstance(user.get('created_at'), str):
+            user['created_at'] = datetime.fromisoformat(user['created_at'])
+    
+    return {"users": users}
+
+@api_router.post("/follow/{user_id}")
+async def follow_user(user_id: str, current_user: Dict = Depends(get_current_user)):
+    """Follow a user"""
+    if current_user['id'] == user_id:
+        raise HTTPException(status_code=400, detail="Cannot follow yourself")
+    
+    # Check if user exists
+    target_user = await db.users.find_one({"id": user_id})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Add to current user's following list
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$addToSet": {"following": user_id}}
+    )
+    
+    # Add to target user's followers list
+    await db.users.update_one(
+        {"id": user_id},
+        {"$addToSet": {"followers": current_user['id']}}
+    )
+    
+    return {"message": "User followed successfully"}
+
+@api_router.delete("/unfollow/{user_id}")
+async def unfollow_user(user_id: str, current_user: Dict = Depends(get_current_user)):
+    """Unfollow a user"""
+    # Remove from current user's following list
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$pull": {"following": user_id}}
+    )
+    
+    # Remove from target user's followers list
+    await db.users.update_one(
+        {"id": user_id},
+        {"$pull": {"followers": current_user['id']}}
+    )
+    
+    return {"message": "User unfollowed successfully"}
+
+@api_router.get("/friends")
+async def get_friends(current_user: Dict = Depends(get_current_user)):
+    """Get user's followers and following"""
+    user = await db.users.find_one({"id": current_user['id']}, {"_id": 0})
+    
+    following_ids = user.get('following', [])
+    followers_ids = user.get('followers', [])
+    
+    # Get following users
+    following_users = []
+    if following_ids:
+        following_users = await db.users.find(
+            {"id": {"$in": following_ids}},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(1000)
+    
+    # Get followers users
+    followers_users = []
+    if followers_ids:
+        followers_users = await db.users.find(
+            {"id": {"$in": followers_ids}},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(1000)
+    
+    # Convert created_at to datetime if needed
+    for user in following_users + followers_users:
+        if isinstance(user.get('created_at'), str):
+            user['created_at'] = datetime.fromisoformat(user['created_at'])
+    
+    return {
+        "following": following_users,
+        "followers": followers_users
+    }
+
 
 # Include the router in the main app
 app.include_router(api_router)

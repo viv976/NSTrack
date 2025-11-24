@@ -17,7 +17,8 @@ const SignupPage = ({ setAuth }) => {
     name: '',
     email: '',
     password: '',
-    skill_level: 'Beginner'
+    skill_level: 'Beginner',
+    batch: ''
   });
   const [loading, setLoading] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -31,14 +32,14 @@ const SignupPage = ({ setAuth }) => {
       const response = await axios.post(`${API}/auth/signup`, formData);
       localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      
+
       // Show celebration
       setShowConfetti(true);
       setShowWelcome(true);
       updateStreak();
-      
+
       toast.success(`Welcome! You've earned ${response.data.user.points} points!`);
-      
+
       // Navigate after animation
       setTimeout(() => {
         setAuth(true);
@@ -64,14 +65,14 @@ const SignupPage = ({ setAuth }) => {
         <source src="/background-video.mp4" type="video/mp4" />
       </video>
       <ConfettiCelebration show={showConfetti} onComplete={() => setShowConfetti(false)} />
-      
+
       <Link to="/" className="absolute top-6 left-6">
         <Button variant="ghost" className="text-slate-300 hover:text-cyan-400" data-testid="home-btn">
           ← Home
         </Button>
       </Link>
-      
-  <div className="w-full max-w-md animate-fade-in relative z-10">
+
+      <div className="w-full max-w-md animate-fade-in relative z-10">
         {showWelcome && (
           <div className="bg-gray-900/90 rounded-2xl p-6 mb-6 text-center border border-gray-800">
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
@@ -80,7 +81,7 @@ const SignupPage = ({ setAuth }) => {
             <p className="text-gray-400">Your learning journey begins now...</p>
           </div>
         )}
-        
+
         <div className="bg-gray-900/90 rounded-2xl p-8 border border-gray-800 hover:border-cyan-500/30 transition-colors">
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
@@ -149,6 +150,25 @@ const SignupPage = ({ setAuth }) => {
                   <SelectItem value="Beginner" data-testid="skill-beginner">Beginner (10 points)</SelectItem>
                   <SelectItem value="Intermediate" data-testid="skill-intermediate">Intermediate (25 points)</SelectItem>
                   <SelectItem value="Advanced" data-testid="skill-advanced">Advanced (50 points)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="batch" className="text-slate-200 text-sm font-medium">Batch</Label>
+              <Select
+                value={formData.batch}
+                onValueChange={(value) => setFormData({ ...formData, batch: value })}
+                disabled={loading}
+              >
+                <SelectTrigger className="mt-2 bg-slate-800/50 border-slate-700 text-white" data-testid="batch-select">
+                  <SelectValue placeholder="Select your batch" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value="Turing" data-testid="batch-turing">Turing</SelectItem>
+                  <SelectItem value="Hopper" data-testid="batch-hopper">Hopper</SelectItem>
+                  <SelectItem value="Neumann" data-testid="batch-neumann">Neumann</SelectItem>
+                  <SelectItem value="Ramanujan" data-testid="batch-ramanujan">Ramanujan</SelectItem>
                 </SelectContent>
               </Select>
             </div>
