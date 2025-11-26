@@ -23,7 +23,6 @@ const HomePage = () => {
     return !sessionStorage.getItem('animationShown');
   });
 
-
   // Create refs for all bubbles for collision detection
   const bubbleData = [
     { key: 'CMD', delay: '0s', duration: '20s', x: '10%', y: '20%' },
@@ -42,7 +41,6 @@ const HomePage = () => {
   const bubbleRefs = useRef(
     bubbleData.map(() => ({ current: null }))
   );
-
 
   useEffect(() => {
     try {
@@ -78,29 +76,30 @@ const HomePage = () => {
     }} />;
   }
 
+
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
+      {/* Floating Interactive Keyboard Keys - All Over Page */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-10">
+        {/* Keyboard keys that move away from mouse */}
+        {bubbleData.map((item, index) => (
+          <InteractiveBubble
+            key={index}
+            ref={bubbleRefs.current[index]}
+            keyText={item.key}
+            initialX={item.x}
+            initialY={item.y}
+            delay={item.delay}
+            duration={item.duration}
+            theme={theme}
+            bubbles={bubbleRefs.current}
+            index={index}
+          />
+        ))}
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        {/* Floating Interactive Keyboard Keys */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Keyboard keys that move away from mouse */}
-          {bubbleData.map((item, index) => (
-            <InteractiveBubble
-              key={index}
-              ref={bubbleRefs.current[index]}
-              keyText={item.key}
-              initialX={item.x}
-              initialY={item.y}
-              delay={item.delay}
-              duration={item.duration}
-              theme={theme}
-              bubbles={bubbleRefs.current}
-              index={index}
-            />
-          ))}
-        </div>
-
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl"></div>

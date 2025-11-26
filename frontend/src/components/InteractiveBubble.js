@@ -149,8 +149,8 @@ const InteractiveBubble = forwardRef(({ keyText, initialX, initialY, delay, dura
                 className="relative w-20 h-20 rounded-full flex items-center justify-center font-mono text-sm font-bold cursor-pointer group"
                 style={{
                     background: theme === 'dark'
-                        ? 'linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%)'
-                        : 'linear-gradient(135deg, rgba(34, 211, 238, 0.3) 0%, rgba(59, 130, 246, 0.2) 100%)',
+                        ? 'linear-gradient(135deg, rgba(34, 211, 238, 0.85) 0%, rgba(59, 130, 246, 0.75) 100%)'
+                        : 'linear-gradient(135deg, rgba(34, 211, 238, 0.9) 0%, rgba(59, 130, 246, 0.8) 100%)',
                     boxShadow: theme === 'dark'
                         ? '0 8px 32px rgba(34, 211, 238, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2)'
                         : '0 8px 32px rgba(34, 211, 238, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.1)',

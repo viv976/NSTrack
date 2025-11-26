@@ -5,17 +5,17 @@ const LoadingScreen = ({ onComplete }) => {
   const [phase, setPhase] = useState('particles'); // particles -> assembly -> reveal -> powerup -> charge -> explode -> blast -> fadeout
 
   useEffect(() => {
-    const assemblyTimer = setTimeout(() => setPhase('assembly'), 1500); // Particles: 1.5s
-    const revealTimer = setTimeout(() => setPhase('reveal'), 3500); // Assembly: 2s
-    const powerupTimer = setTimeout(() => setPhase('powerup'), 4300); // Reveal: 0.8s
-    const chargeTimer = setTimeout(() => setPhase('charge'), 6000); // Powerup: 1.7s
-    const explodeTimer = setTimeout(() => setPhase('explode'), 7700); // Charge: 1.7s
-    const blastTimer = setTimeout(() => setPhase('blast'), 8200); // Explode: 0.5s
-    const fadeTimer = setTimeout(() => setPhase('fadeout'), 8900); // Blast: 0.7s
+    const assemblyTimer = setTimeout(() => setPhase('assembly'), 500); // Particles: 0.5s
+    const revealTimer = setTimeout(() => setPhase('reveal'), 1200); // Assembly: 0.7s
+    const powerupTimer = setTimeout(() => setPhase('powerup'), 1500); // Reveal: 0.3s
+    const chargeTimer = setTimeout(() => setPhase('charge'), 2100); // Powerup: 0.6s
+    const explodeTimer = setTimeout(() => setPhase('explode'), 2700); // Charge: 0.6s
+    const blastTimer = setTimeout(() => setPhase('blast'), 2900); // Explode: 0.2s
+    const fadeTimer = setTimeout(() => setPhase('fadeout'), 3200); // Blast: 0.3s
     const completeTimer = setTimeout(() => {
       setIsVisible(false);
       if (onComplete) onComplete();
-    }, 10500); // Total: 10.5s
+    }, 3500); // Total: 3.5s
 
     return () => {
       clearTimeout(assemblyTimer);
@@ -285,7 +285,7 @@ const LoadingScreen = ({ onComplete }) => {
                   style={{
                     fontFamily: "'Space Grotesk', sans-serif",
                     letterSpacing: '0.05em',
-                    animation: 'backgroundTextPulse 3s ease-in-out infinite',
+                    animation: 'backgroundTextPulse 1.5s ease-in-out infinite',
                     animationDelay: `${i * 0.1}s`,
                   }}
                 >
@@ -313,7 +313,7 @@ const LoadingScreen = ({ onComplete }) => {
           className="relative"
           style={{
             transformStyle: 'preserve-3d',
-            animation: (phase === 'particles' || phase === 'assembly') ? 'cameraOrbit 3.5s linear forwards' : 'none',
+            animation: (phase === 'particles' || phase === 'assembly') ? 'cameraOrbit 1.2s linear forwards' : 'none',
           }}
         >
           {/* PARTICLE SWIRL PHASE */}
@@ -334,8 +334,8 @@ const LoadingScreen = ({ onComplete }) => {
                       '--end-x': `${endX}px`,
                       '--end-y': `${endY}px`,
                       background: 'radial-gradient(circle, #94a3b8, #64748b)',
-                      animation: `particleSwirl 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
-                      animationDelay: `${particle.delay}s`,
+                      animation: `particleSwirl 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+                      animationDelay: `${particle.delay * 0.3}s`,
                       boxShadow: '0 0 4px rgba(148, 163, 184, 0.8)',
                     }}
                   />

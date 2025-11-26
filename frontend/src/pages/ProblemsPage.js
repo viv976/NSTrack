@@ -384,7 +384,7 @@ const ProblemsPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label className={`text-sm font-medium mb-2 block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-700'}`}>
-                Learning Track
+                Languages you want to do questions for
               </label>
               <Select value={selectedTrack} onValueChange={setSelectedTrack}>
                 <SelectTrigger
@@ -393,14 +393,15 @@ const ProblemsPage = () => {
                     : 'bg-gray-50 border-gray-300 text-slate-900'
                   }
                 >
-                  <SelectValue placeholder="All Tracks" />
+                  <SelectValue placeholder="All Languages" />
                 </SelectTrigger>
                 <SelectContent className={theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-300'}>
-                  <SelectItem value="all">All Tracks</SelectItem>
-                  <SelectItem value="dsa-cp">DSA & CP</SelectItem>
-                  <SelectItem value="web-dev">Web Development</SelectItem>
-                  <SelectItem value="app-dev">App Development</SelectItem>
-                  <SelectItem value="ai-ml">AI / ML</SelectItem>
+                  <SelectItem value="all">All Languages</SelectItem>
+                  <SelectItem value="python">Python</SelectItem>
+                  <SelectItem value="java">Java</SelectItem>
+                  <SelectItem value="html_css">HTML & CSS</SelectItem>
+                  <SelectItem value="cpp">C++</SelectItem>
+                  <SelectItem value="javascript">JavaScript</SelectItem>
                 </SelectContent>
               </Select>
             </div>
