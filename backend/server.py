@@ -363,9 +363,40 @@ async def generate_problems(request: ProblemRequest, current_user: Dict = Depend
     system_message = f"""You are a coding problem generator for NSTrack platform.
 Generate {request.count} {request.difficulty} level problems for {request.track}.
 
+**SPECIAL INSTRUCTIONS FOR HTML/CSS PROBLEMS:**
+When generating HTML/CSS problems, include these requirements in the description:
+
+1. **Structure the page using proper HTML elements**
+   - Recreate every visible section shown in the reference
+   - Use correct tags for inputs, labels, buttons, headings, containers, etc.
+   - Maintain the same order and grouping as shown
+
+2. **Style the page using CSS**
+   Match the UI exactly by applying:
+   - proper layout (flexbox/grid)
+   - spacing (margin, padding)
+   - fonts (size, weight)
+   - colors (background, text, borders)
+   - element sizes (inputs, buttons, boxes)
+   - alignment (center, left, right)
+   - borders and shadows (if visible)
+
+3. **Responsiveness**
+   - Include media queries to adjust layout on smaller screens
+   - Ensure mobile-friendly behavior
+
+4. **Output Requirements**
+   Your final output should visually match the reference image in:
+   - layout
+   - spacing
+   - sizing
+   - color
+   - alignment
+   - typography
+
 For each problem, provide:
 1. Title (concise, descriptive)
-2. Description (clear problem statement)
+2. Description (clear problem statement with reference image description)
 3. 2-3 Hints (progressive difficulty)
 4. Solution Approach (high-level algorithm)
 
