@@ -5,6 +5,7 @@ import '@/App.css';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import Dashboard from './pages/Dashboard';
 import FriendsPage from './pages/FriendsPage';
 import LanguagePage from './pages/LanguagePage';
@@ -61,6 +62,10 @@ const AppContent = () => {
             <Route
               path="/signup"
               element={!isAuthenticated ? <SignupPage setAuth={setIsAuthenticated} /> : <Navigate to="/dashboard" />}
+            />
+            <Route
+              path="/forgot-password"
+              element={!isAuthenticated ? <ForgotPasswordPage setAuth={setIsAuthenticated} /> : <Navigate to="/dashboard" />}
             />
             <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
             <Route path="/friends" element={isAuthenticated ? <FriendsPage /> : <Navigate to="/login" />} />

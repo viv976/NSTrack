@@ -176,6 +176,15 @@ const LoginPage = ({ setAuth }) => {
               </div>
             </div>
 
+            <div className="flex justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
             <Button
               type="submit"
               data-testid="login-submit-btn"

@@ -14,6 +14,9 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 # from emergentintegrations.llm.chat import LlmChat, UserMessage
 import asyncio
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -42,6 +45,23 @@ class UserSignup(BaseModel):
     password: str
     skill_level: str  # Beginner, Intermediate, Advanced
     batch: Optional[str] = None  # Turing, Hopper, Neumann, Ramanujan
+    gender: Optional[str] = None  # Male, Female, Non-binary, etc.
+
+class PasswordResetToken(BaseModel):
+    email: EmailStr
+    token: str
+    type: str  # "reset" or "magic_link"
+    expires_at: datetime
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+class MagicLoginRequest(BaseModel):
+    token: str
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -54,6 +74,7 @@ class User(BaseModel):
     email: str
     skill_level: str
     batch: Optional[str] = None
+    gender: Optional[str] = None
     points: int = 10
     selected_track: Optional[str] = None
     following: List[str] = Field(default_factory=list)  # List of user IDs
@@ -126,6 +147,17 @@ class Friendship(BaseModel):
 class FriendRequestAction(BaseModel):
     request_id: str
 
+class Notification(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str  # Recipient of notification
+    type: str  # "friend_request", "track_completed", "friend_accepted"
+    title: str
+    message: str
+    link: Optional[str] = None  # URL to navigate to
+    read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # Helper Functions
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -181,6 +213,7 @@ async def signup(user_data: UserSignup):
         email=user_data.email,
         skill_level=user_data.skill_level,
         batch=user_data.batch,
+        gender=user_data.gender,
         points=points
     )
     
@@ -535,6 +568,16 @@ async def send_friend_request(receiver_id: str, current_user: Dict = Depends(get
     
     await db.friend_requests.insert_one(request_dict)
     
+    # Create notification for receiver
+    notification = Notification(
+        user_id=receiver_id,
+        type="friend_request",
+        title="New Friend Request",
+        message=f"{current_user['name']} sent you a friend request",
+        link="/friends?tab=incoming"
+    )
+    await db.notifications.insert_one(notification.model_dump())
+    
     return {"message": "Friend request sent successfully", "request_id": friend_request.id}
 
 @api_router.get("/friends/requests/incoming")
@@ -620,6 +663,16 @@ async def accept_friend_request(request_id: str, current_user: Dict = Depends(ge
     friendship_dict['created_at'] = friendship_dict['created_at'].isoformat()
     
     await db.friendships.insert_one(friendship_dict)
+    
+    # Create notification for sender
+    notification = Notification(
+        user_id=request['sender_id'],
+        type="friend_accepted",
+        title="Friend Request Accepted",
+        message=f"{current_user['name']} accepted your friend request",
+        link="/friends"
+    )
+    await db.notifications.insert_one(notification.model_dump())
     
     return {"message": "Friend request accepted", "friendship_id": friendship.id}
 
@@ -754,6 +807,227 @@ async def search_users(q: str, current_user: Dict = Depends(get_current_user)):
             user['created_at'] = datetime.fromisoformat(user['created_at'])
     
     return {"users": users}
+
+
+# Notification Endpoints
+@api_router.get("/notifications/unread")
+async def get_unread_notifications(current_user: Dict = Depends(get_current_user)):
+    """Get all unread notifications"""
+    notifications = await db.notifications.find(
+        {"user_id": current_user['id'], "read": False},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return {"notifications": notifications, "count": len(notifications)}
+
+@api_router.get("/notifications")
+async def get_notifications(current_user: Dict = Depends(get_current_user)):
+    """Get all notifications"""
+    notifications = await db.notifications.find(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    return {"notifications": notifications}
+
+@api_router.post("/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: Dict = Depends(get_current_user)):
+    """Mark a notification as read"""
+    result = await db.notifications.update_one(
+        {"id": notification_id, "user_id": current_user['id']},
+        {"$set": {"read": True}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification marked as read"}
+
+@api_router.post("/notifications/mark-all-read")
+async def mark_all_notifications_read(current_user: Dict = Depends(get_current_user)):
+    """Mark all notifications as read"""
+    await db.notifications.update_many(
+        {"user_id": current_user['id'], "read": False},
+        {"$set": {"read": True}}
+    )
+    
+    return {"message": "All notifications marked as read"}
+
+@api_router.delete("/notifications/{notification_id}")
+async def delete_notification(notification_id: str, current_user: Dict = Depends(get_current_user)):
+    """Delete a notification"""
+    result = await db.notifications.delete_one(
+        {"id": notification_id, "user_id": current_user['id']}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification deleted"}
+
+@api_router.post("/tracks/complete")
+async def complete_track(track_data: dict, current_user: Dict = Depends(get_current_user)):
+    """Complete a track and notify friends"""
+    track_name = track_data.get('track')
+    if not track_name:
+        raise HTTPException(status_code=400, detail="Track name required")
+        
+    # Create notification for user
+    user_notification = Notification(
+        user_id=current_user['id'],
+        type="track_completed",
+        title="Track Completed! 🏆",
+        message=f"Congratulations on completing the {track_name} track!",
+        link="/profile"
+    )
+    await db.notifications.insert_one(user_notification.model_dump())
+    
+    # Notify friends
+    friends_list = await get_friends_list(current_user)
+    friends = friends_list.get('friends', [])
+    
+    for friend in friends:
+        friend_notification = Notification(
+            user_id=friend['id'],
+            type="friend_track_completed",
+            title="Friend Achievement",
+            message=f"{current_user['name']} completed the {track_name} track!",
+            link=f"/profile?user_id={current_user['id']}"
+        )
+        await db.notifications.insert_one(friend_notification.model_dump())
+        
+    return {"message": "Track completion recorded"}
+
+
+    return {"message": "Track completion recorded"}
+
+
+# Email Helper
+def send_email(to_email: str, subject: str, body: str):
+    """Send an email using Gmail SMTP"""
+    sender_email = os.environ.get('MAIL_USERNAME')
+    sender_password = os.environ.get('MAIL_PASSWORD')
+    
+    if not sender_email or not sender_password:
+        print("WARNING: Email credentials not found. Printing to console instead.")
+        print(f"To: {to_email}\nSubject: {subject}\nBody: {body}")
+        return
+
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Connect to Gmail SMTP
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+            
+        print(f"Email sent successfully to {to_email}")
+    except Exception as e:
+        print(f"Failed to send email: {str(e)}")
+        # Fallback to console in case of error
+        print(f"To: {to_email}\nSubject: {subject}\nBody: {body}")
+
+
+# Password Recovery Endpoints
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    """Request a password reset or magic link"""
+    # Case insensitive lookup
+    email_lower = request.email.lower()
+    
+    # Try to find user with case-insensitive regex if exact match fails
+    user = await db.users.find_one({"email": email_lower})
+    if not user:
+        # Try finding with case-insensitive regex
+        user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
+    
+    if not user:
+        # Don't reveal if user exists
+        return {"message": "If an account exists, a recovery code has been sent."}
+    
+    # Use the email from the database to ensure consistency
+    user_email = user['email']
+    
+    # Generate token
+    token = str(uuid.uuid4())
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+    
+    reset_token = PasswordResetToken(
+        email=user_email,
+        token=token,
+        type="reset", # Can be used for both reset and magic link
+        expires_at=expires_at
+    )
+    
+    await db.password_resets.insert_one(reset_token.model_dump())
+    
+    # Send Email
+    subject = "NSTrack Login Code"
+    body = f"Your login/recovery code is: {token}\n\nThis code expires in 15 minutes."
+    
+    # Run in thread pool to not block async loop
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, send_email, user_email, subject, body)
+    
+    return {"message": "If an account exists, a recovery code has been sent."}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(request: ResetPasswordRequest):
+    """Reset password using token"""
+    reset_token = await db.password_resets.find_one({
+        "token": request.token,
+        "expires_at": {"$gt": datetime.now(timezone.utc)}
+    })
+    
+    if not reset_token:
+        raise HTTPException(status_code=400, detail="Invalid or expired code")
+        
+    # Hash new password
+    password_hash = hash_password(request.new_password)
+    
+    # Update user password
+    await db.users.update_one(
+        {"email": reset_token['email']},
+        {"$set": {"password_hash": password_hash}}
+    )
+    
+    # Delete used token
+    await db.password_resets.delete_one({"token": request.token})
+    
+    return {"message": "Password successfully reset"}
+
+@api_router.post("/auth/magic-login")
+async def magic_login(request: MagicLoginRequest):
+    """Login using magic link token"""
+    reset_token = await db.password_resets.find_one({
+        "token": request.token,
+        "expires_at": {"$gt": datetime.now(timezone.utc)}
+    })
+    
+    if not reset_token:
+        raise HTTPException(status_code=400, detail="Invalid or expired code")
+        
+    # Get user
+    user = await db.users.find_one({"email": reset_token['email']})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    # Create access token
+    access_token = create_access_token(data={"sub": user['id']})
+    
+    # Delete used token
+    await db.password_resets.delete_one({"token": request.token})
+    
+    # Convert _id to string for response
+    user_response = User(**user)
+    
+    return TokenResponse(access_token=access_token, user=user_response)
+
 
 
 

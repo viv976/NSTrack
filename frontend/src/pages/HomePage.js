@@ -8,6 +8,7 @@ import InteractiveBubble from '../components/InteractiveBubble';
 import InteractiveSection from '../components/InteractiveSection';
 import LoadingScreen from '../components/LoadingScreen';
 import { useTheme } from '../context/ThemeContext';
+import NotificationBell from '../components/NotificationBell';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -123,9 +124,9 @@ const HomePage = () => {
               </div>
 
               {/* bell */}
-              <button className="p-2 rounded-md hover:bg-white/5">
-                <Bell className={`w-5 h-5 ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`} />
-              </button>
+              <div className="p-2">
+                <NotificationBell />
+              </div>
 
               {/* Dropdown menu: shows Login/Sign Up when unauthenticated; Profile/Logout when authenticated */}
               <div className="relative">

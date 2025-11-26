@@ -7,6 +7,7 @@ import { Progress } from '../components/ui/progress';
 import { toast } from 'sonner';
 import { useTheme } from '../context/ThemeContext';
 import { useProgress } from '../context/ProgressContext';
+import NotificationBell from '../components/NotificationBell';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -102,6 +103,7 @@ const Dashboard = () => {
             </h1>
           </Link>
           <div className="flex items-center gap-3 flex-wrap justify-end">
+            <NotificationBell />
             <div className="hidden md:block">
               <Select value={selectedLanguage} onValueChange={handleLanguageSelect}>
                 <SelectTrigger className="w-[220px] bg-gray-900/70 border-gray-800 text-slate-200 hover:border-cyan-500/50 transition-all duration-300" data-testid="language-nav-selector">
@@ -155,9 +157,13 @@ const Dashboard = () => {
 
             <div className="relative z-10">
               <h2 className="text-4xl font-bold text-white mb-3 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-[length:200%_auto] animate-shimmer">
-                {localStorage.getItem('firstLogin') === 'false' ?
-                  `Welcome to NSTrack, ${user?.name?.split(' ')[0]}! 🎉` :
-                  `Welcome back, ${user?.name?.split(' ')[0]}!`}
+                {user?.name ? (
+                  localStorage.getItem('firstLogin') === 'false' ?
+                    `Welcome to NSTrack, ${user.name.split(' ')[0]}! 🎉` :
+                    `Welcome back, ${user.name.split(' ')[0]}!`
+                ) : (
+                  'Welcome to NSTrack! 🎉'
+                )}
               </h2>
               <div className="flex items-center gap-3">
                 <p className="text-lg text-slate-300">

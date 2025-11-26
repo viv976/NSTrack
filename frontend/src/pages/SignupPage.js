@@ -18,7 +18,8 @@ const SignupPage = ({ setAuth }) => {
     email: '',
     password: '',
     skill_level: 'Beginner',
-    batch: ''
+    batch: '',
+    gender: ''
   });
   const [loading, setLoading] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -169,6 +170,30 @@ const SignupPage = ({ setAuth }) => {
                   <SelectItem value="Hopper" data-testid="batch-hopper">Hopper</SelectItem>
                   <SelectItem value="Neumann" data-testid="batch-neumann">Neumann</SelectItem>
                   <SelectItem value="Ramanujan" data-testid="batch-ramanujan">Ramanujan</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="gender" className="text-slate-200 text-sm font-medium">Gender (Optional)</Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                disabled={loading}
+              >
+                <SelectTrigger className="mt-2 bg-slate-800/50 border-slate-700 text-white">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                  <SelectItem value="Non-binary">Non-binary</SelectItem>
+                  <SelectItem value="Genderqueer">Genderqueer</SelectItem>
+                  <SelectItem value="Genderfluid">Genderfluid</SelectItem>
+                  <SelectItem value="Agender">Agender</SelectItem>
+                  <SelectItem value="Two-Spirit">Two-Spirit</SelectItem>
+                  <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>

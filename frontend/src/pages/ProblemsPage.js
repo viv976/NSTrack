@@ -384,7 +384,7 @@ const ProblemsPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label className={`text-sm font-medium mb-2 block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-700'}`}>
-                Languages you want to do questions for
+                Learning Track
               </label>
               <Select value={selectedTrack} onValueChange={setSelectedTrack}>
                 <SelectTrigger
