@@ -107,6 +107,25 @@ class LanguageContent(BaseModel):
     section: str
     content: str
 
+class FriendRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sender_id: str
+    receiver_id: str
+    status: str = "pending"  # pending, accepted, rejected
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Friendship(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user1_id: str
+    user2_id: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class FriendRequestAction(BaseModel):
+    request_id: str
+
 # Helper Functions
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -467,7 +486,244 @@ async def complete_problem(data: ProblemComplete, current_user: Dict = Depends(g
     
     return {"message": "Problem marked as complete"}
 
-# Friends endpoints
+# Friend Request System
+async def check_if_friends(user1_id: str, user2_id: str) -> bool:
+    """Check if two users are friends"""
+    friendship = await db.friendships.find_one({
+        "$or": [
+            {"user1_id": user1_id, "user2_id": user2_id},
+            {"user1_id": user2_id, "user2_id": user1_id}
+        ]
+    })
+    return friendship is not None
+
+@api_router.post("/friends/request/{receiver_id}")
+async def send_friend_request(receiver_id: str, current_user: Dict = Depends(get_current_user)):
+    """Send a friend request to another user"""
+    if current_user['id'] == receiver_id:
+        raise HTTPException(status_code=400, detail="Cannot send friend request to yourself")
+    
+    # Check if receiver exists
+    receiver = await db.users.find_one({"id": receiver_id})
+    if not receiver:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if already friends
+    if await check_if_friends(current_user['id'], receiver_id):
+        raise HTTPException(status_code=400, detail="Already friends with this user")
+    
+    # Check if request already exists (pending)
+    existing_request = await db.friend_requests.find_one({
+        "$or": [
+            {"sender_id": current_user['id'], "receiver_id": receiver_id, "status": "pending"},
+            {"sender_id": receiver_id, "receiver_id": current_user['id'], "status": "pending"}
+        ]
+    })
+    
+    if existing_request:
+        raise HTTPException(status_code=400, detail="Friend request already pending")
+    
+    # Create friend request
+    friend_request = FriendRequest(
+        sender_id=current_user['id'],
+        receiver_id=receiver_id
+    )
+    
+    request_dict = friend_request.model_dump()
+    request_dict['created_at'] = request_dict['created_at'].isoformat()
+    request_dict['updated_at'] = request_dict['updated_at'].isoformat()
+    
+    await db.friend_requests.insert_one(request_dict)
+    
+    return {"message": "Friend request sent successfully", "request_id": friend_request.id}
+
+@api_router.get("/friends/requests/incoming")
+async def get_incoming_requests(current_user: Dict = Depends(get_current_user)):
+    """Get all incoming friend requests"""
+    requests = await db.friend_requests.find(
+        {"receiver_id": current_user['id'], "status": "pending"},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    # Get sender details for each request
+    for request in requests:
+        sender = await db.users.find_one(
+            {"id": request['sender_id']},
+            {"_id": 0, "password_hash": 0}
+        )
+        if sender:
+            request['sender'] = {
+                "id": sender['id'],
+                "name": sender['name'],
+                "batch": sender.get('batch'),
+                "skill_level": sender.get('skill_level')
+            }
+        if isinstance(request.get('created_at'), str):
+            request['created_at'] = datetime.fromisoformat(request['created_at'])
+    
+    return {"requests": requests}
+
+@api_router.get("/friends/requests/outgoing")
+async def get_outgoing_requests(current_user: Dict = Depends(get_current_user)):
+    """Get all outgoing friend requests"""
+    requests = await db.friend_requests.find(
+        {"sender_id": current_user['id'], "status": "pending"},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    # Get receiver details for each request
+    for request in requests:
+        receiver = await db.users.find_one(
+            {"id": request['receiver_id']},
+            {"_id": 0, "password_hash": 0}
+        )
+        if receiver:
+            request['receiver'] = {
+                "id": receiver['id'],
+                "name": receiver['name'],
+                "batch": receiver.get('batch'),
+                "skill_level": receiver.get('skill_level')
+            }
+        if isinstance(request.get('created_at'), str):
+            request['created_at'] = datetime.fromisoformat(request['created_at'])
+    
+    return {"requests": requests}
+
+@api_router.post("/friends/accept/{request_id}")
+async def accept_friend_request(request_id: str, current_user: Dict = Depends(get_current_user)):
+    """Accept a friend request"""
+    # Get the request
+    request = await db.friend_requests.find_one({"id": request_id}, {"_id": 0})
+    
+    if not request:
+        raise HTTPException(status_code=404, detail="Friend request not found")
+    
+    if request['receiver_id'] != current_user['id']:
+        raise HTTPException(status_code=403, detail="You can only accept requests sent to you")
+    
+    if request['status'] != "pending":
+        raise HTTPException(status_code=400, detail="Request is not pending")
+    
+    # Update request status
+    await db.friend_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "accepted", "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    # Create friendship
+    friendship = Friendship(
+        user1_id=request['sender_id'],
+        user2_id=request['receiver_id']
+    )
+    
+    friendship_dict = friendship.model_dump()
+    friendship_dict['created_at'] = friendship_dict['created_at'].isoformat()
+    
+    await db.friendships.insert_one(friendship_dict)
+    
+    return {"message": "Friend request accepted", "friendship_id": friendship.id}
+
+@api_router.post("/friends/reject/{request_id}")
+async def reject_friend_request(request_id: str, current_user: Dict = Depends(get_current_user)):
+    """Reject a friend request"""
+    # Get the request
+    request = await db.friend_requests.find_one({"id": request_id}, {"_id": 0})
+    
+    if not request:
+        raise HTTPException(status_code=404, detail="Friend request not found")
+    
+    if request['receiver_id'] != current_user['id']:
+        raise HTTPException(status_code=403, detail="You can only reject requests sent to you")
+    
+    if request['status'] != "pending":
+        raise HTTPException(status_code=400, detail="Request is not pending")
+    
+    # Update request status
+    await db.friend_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "rejected", "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Friend request rejected"}
+
+@api_router.delete("/friends/remove/{friend_id}")
+async def remove_friend(friend_id: str, current_user: Dict = Depends(get_current_user)):
+    """Remove a friend"""
+    # Remove friendship
+    result = await db.friendships.delete_one({
+        "$or": [
+            {"user1_id": current_user['id'], "user2_id": friend_id},
+            {"user1_id": friend_id, "user2_id": current_user['id']}
+        ]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Friendship not found")
+    
+    return {"message": "Friend removed successfully"}
+
+@api_router.get("/friends/list")
+async def get_friends_list(current_user: Dict = Depends(get_current_user)):
+    """Get list of all friends"""
+    friendships = await db.friendships.find({
+        "$or": [
+            {"user1_id": current_user['id']},
+            {"user2_id": current_user['id']}
+        ]
+    }, {"_id": 0}).to_list(1000)
+    
+    friend_ids = []
+    for friendship in friendships:
+        if friendship['user1_id'] == current_user['id']:
+            friend_ids.append(friendship['user2_id'])
+        else:
+            friend_ids.append(friendship['user1_id'])
+    
+    # Get friend details with privacy - show full profile for friends
+    friends = []
+    if friend_ids:
+        friends = await db.users.find(
+            {"id": {"$in": friend_ids}},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(1000)
+        
+        for friend in friends:
+            if isinstance(friend.get('created_at'), str):
+                friend['created_at'] = datetime.fromisoformat(friend['created_at'])
+    
+    return {"friends": friends}
+
+@api_router.get("/friends/status/{user_id}")
+async def check_friendship_status(user_id: str, current_user: Dict = Depends(get_current_user)):
+    """Check friendship status with a user"""
+    if current_user['id'] == user_id:
+        return {"status": "self"}
+    
+    # Check if friends
+    if await check_if_friends(current_user['id'], user_id):
+        return {"status": "friends"}
+    
+    # Check for pending request sent by current user
+    sent_request = await db.friend_requests.find_one({
+        "sender_id": current_user['id'],
+        "receiver_id": user_id,
+        "status": "pending"
+    })
+    
+    if sent_request:
+        return {"status": "request_sent", "request_id": sent_request['id']}
+    
+    # Check for pending request received by current user
+    received_request = await db.friend_requests.find_one({
+        "sender_id": user_id,
+        "receiver_id": current_user['id'],
+        "status": "pending"
+    })
+    
+    return {"status": "none"}
+
+
+# User search endpoints
 @api_router.get("/users")
 async def get_users(batch: Optional[str] = None, current_user: Dict = Depends(get_current_user)):
     """Get all users with optional batch filter"""
@@ -499,81 +755,6 @@ async def search_users(q: str, current_user: Dict = Depends(get_current_user)):
     
     return {"users": users}
 
-@api_router.post("/follow/{user_id}")
-async def follow_user(user_id: str, current_user: Dict = Depends(get_current_user)):
-    """Follow a user"""
-    if current_user['id'] == user_id:
-        raise HTTPException(status_code=400, detail="Cannot follow yourself")
-    
-    # Check if user exists
-    target_user = await db.users.find_one({"id": user_id})
-    if not target_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Add to current user's following list
-    await db.users.update_one(
-        {"id": current_user['id']},
-        {"$addToSet": {"following": user_id}}
-    )
-    
-    # Add to target user's followers list
-    await db.users.update_one(
-        {"id": user_id},
-        {"$addToSet": {"followers": current_user['id']}}
-    )
-    
-    return {"message": "User followed successfully"}
-
-@api_router.delete("/unfollow/{user_id}")
-async def unfollow_user(user_id: str, current_user: Dict = Depends(get_current_user)):
-    """Unfollow a user"""
-    # Remove from current user's following list
-    await db.users.update_one(
-        {"id": current_user['id']},
-        {"$pull": {"following": user_id}}
-    )
-    
-    # Remove from target user's followers list
-    await db.users.update_one(
-        {"id": user_id},
-        {"$pull": {"followers": current_user['id']}}
-    )
-    
-    return {"message": "User unfollowed successfully"}
-
-@api_router.get("/friends")
-async def get_friends(current_user: Dict = Depends(get_current_user)):
-    """Get user's followers and following"""
-    user = await db.users.find_one({"id": current_user['id']}, {"_id": 0})
-    
-    following_ids = user.get('following', [])
-    followers_ids = user.get('followers', [])
-    
-    # Get following users
-    following_users = []
-    if following_ids:
-        following_users = await db.users.find(
-            {"id": {"$in": following_ids}},
-            {"_id": 0, "password_hash": 0}
-        ).to_list(1000)
-    
-    # Get followers users
-    followers_users = []
-    if followers_ids:
-        followers_users = await db.users.find(
-            {"id": {"$in": followers_ids}},
-            {"_id": 0, "password_hash": 0}
-        ).to_list(1000)
-    
-    # Convert created_at to datetime if needed
-    for user in following_users + followers_users:
-        if isinstance(user.get('created_at'), str):
-            user['created_at'] = datetime.fromisoformat(user['created_at'])
-    
-    return {
-        "following": following_users,
-        "followers": followers_users
-    }
 
 
 # Include the router in the main app
